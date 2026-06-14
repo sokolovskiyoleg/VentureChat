@@ -40,6 +40,7 @@ public class ChatChannel {
 	private boolean defaultChannel;
 	private boolean autojoin;
 	private String alias;
+	private String quickSymbol;
 	private double distance;
 	private boolean filter;
 	private boolean bungee;
@@ -68,12 +69,13 @@ public class ChatChannel {
 			String format = cs.getString(key + ".format", "Default");
 			boolean defaultChannel = cs.getBoolean(key + ".default", false);
 			String alias = cs.getString(key + ".alias", "None");
+			String quickSymbol = cs.getString(key + ".quickSymbol", "None");
 			double distance = cs.getDouble(key + ".distance", (double) 0);
 			int cooldown = cs.getInt(key + ".cooldown", 0);
 			boolean autojoin = cs.getBoolean(key + ".autojoin", false);
 			String prefix = cs.getString(key + ".channel_prefix");
 			ChatChannel chatChannel = new ChatChannel(name, color, chatColor, permission, speakPermission, mutable,
-					filter, defaultChannel, alias, distance, autojoin, bungee, cooldown, prefix, format);
+					filter, defaultChannel, alias, quickSymbol, distance, autojoin, bungee, cooldown, prefix, format);
 			channels[counter++] = chatChannel;
 			chatChannels.put(name.toLowerCase(), chatChannel);
 			chatChannels.put(alias.toLowerCase(), chatChannel);
@@ -86,7 +88,7 @@ public class ChatChannel {
 		if(defaultChatChannel == null) {
 			Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&e - &cNo default channel found!"));
 			defaultChatChannel = new ChatChannel("MissingDefault", "red", "red", "None", "None", false,
-					true, true, "md", 0, true, false, 0, "&f[&cMissingDefault&f]", "{venturechat_channel_prefix} {vault_prefix}{player_displayname}&c:");
+					true, true, "md", "None", 0, true, false, 0, "&f[&cMissingDefault&f]", "{venturechat_channel_prefix} {vault_prefix}{player_displayname}&c:");
 			defaultColor = defaultChatChannel.getColor();
 			chatChannels.put("missingdefault", defaultChatChannel);
 			chatChannels.put("md", defaultChatChannel);
@@ -186,7 +188,7 @@ public class ChatChannel {
 	 * @param format
 	 */
 	public ChatChannel(String name, String color, String chatColor, String permission, String speakPermission,
-			boolean mutable, boolean filter, boolean defaultChannel, String alias, double distance, boolean autojoin,
+			boolean mutable, boolean filter, boolean defaultChannel, String alias, String quickSymbol, double distance, boolean autojoin,
 			boolean bungee, int cooldown, String prefix, String format) {
 		this.name = name;
 		this.color = color;
@@ -197,6 +199,7 @@ public class ChatChannel {
 		this.filter = filter;
 		this.defaultChannel = defaultChannel;
 		this.alias = alias;
+		this.quickSymbol = quickSymbol;
 		this.distance = distance;
 		this.autojoin = autojoin;
 		this.bungee = bungee;
@@ -388,6 +391,11 @@ public class ChatChannel {
 	public String getAlias() {
 		return alias;
 	}
+
+	/**
+	 * Get quickSymbol of chat channel
+	 */
+	public String getQuickSymbol() { return quickSymbol; }
 
 	/**
 	 * Get the distance of the chat channel in blocks.

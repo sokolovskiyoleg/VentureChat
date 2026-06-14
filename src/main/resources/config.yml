@@ -300,6 +300,7 @@ channels:
     distance: 0
     cooldown: 0
     bungeecord: false
+    quickSymbol: '!'
     alias: g
     permissions: None
     speak_permissions: None

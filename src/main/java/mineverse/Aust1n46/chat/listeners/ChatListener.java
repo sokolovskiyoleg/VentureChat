@@ -62,8 +62,16 @@ public class ChatListener implements Listener {
 		Set<Player> recipients = event.getRecipients();
 		int recipientCount = recipients.size(); // Don't count vanished players
 		MineverseChatPlayer mcp = MineverseChatAPI.getOnlineMineverseChatPlayer(event.getPlayer());
+		for (ChatChannel channel : ChatChannel.getAutojoinList()){
+			if(!channel.getQuickSymbol().equals("None")){
+				if(chat.startsWith(channel.getQuickSymbol())){
+					mcp.setCurrentChannel(channel);
+					chat = chat.substring(1);
+					break;
+				}
+			}
+		}
 		ChatChannel eventChannel = mcp.getCurrentChannel();
-		
 		if(mcp.isEditing()) {
 			mcp.getPlayer().sendMessage(Format.FormatStringAll(chat));
 			mcp.setEditing(false);
@@ -73,7 +81,7 @@ public class ChatListener implements Listener {
 		if(mcp.isQuickChat()) {
 			eventChannel = mcp.getQuickChannel();
 		}
-		
+
 		if(mcp.hasConversation() && !mcp.isQuickChat()) {
 			MineverseChatPlayer tp = MineverseChatAPI.getMineverseChatPlayer(mcp.getConversation());
 			if(!tp.isOnline()) {
@@ -484,7 +492,7 @@ public class ChatListener implements Listener {
 			chat = curColor + chat;
 		}
 		
-		String globalJSON = Format.convertToJson(mcp, format, chat); 
+		String globalJSON = Format.convertToJson(mcp, format, chat);
 		format = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), Format.FormatStringAll(format)));
 		String message = Format.stripColor(format + chat); // UTF-8 encoding issues.
 		int hash = message.hashCode();
@@ -496,6 +504,7 @@ public class ChatListener implements Listener {
 		//Call method to send the processed chat
 		handleVentureChatEvent(ventureChatEvent);
 		// Reset quick chat flag
+		mcp.setCurrentChannel(ChatChannel.getDefaultChannel());
 		mcp.setQuickChat(false);
 	}
 	

@@ -22,8 +22,6 @@ public final class MineverseChatAPI {
     private static HashMap<UUID, MineverseChatPlayer> onlinePlayerMap = new HashMap<UUID, MineverseChatPlayer>();
     private static List<String> networkPlayerNames = new ArrayList<String>();
 
-    private static HashMap<UUID, SynchronizedMineverseChatPlayer> proxyPlayerMap = new HashMap<UUID, SynchronizedMineverseChatPlayer>();
-
     public static List<String> getNetworkPlayerNames() {
         return networkPlayerNames;
     }
@@ -34,23 +32,6 @@ public final class MineverseChatAPI {
 
     public static void addNetworkPlayerName(String name) {
         networkPlayerNames.add(name);
-    }
-
-    public static void addSynchronizedMineverseChatPlayerToMap(SynchronizedMineverseChatPlayer smcp) {
-        proxyPlayerMap.put(smcp.getUUID(), smcp);
-    }
-
-//    @Deprecated
-//    public static void clearBungeePlayerMap() {
-//        clearProxyPlayerMap();
-//    }
-    
-    public static void clearProxyPlayerMap() {
-        proxyPlayerMap.clear();
-    }
-
-    public static Collection<SynchronizedMineverseChatPlayer> getSynchronizedMineverseChatPlayers() {
-        return proxyPlayerMap.values();
     }
 
     public static void addNameToMap(MineverseChatPlayer mcp) {
@@ -166,13 +147,4 @@ public final class MineverseChatAPI {
         return getOnlineMineverseChatPlayer(namesMap.get(name));
     }
 
-    /**
-     * Get a SynchronizedMineverseChatPlayer from a UUID.
-     *
-     * @param uuid {@link UUID}
-     * @return {@link SynchronizedMineverseChatPlayer}
-     */
-    public static SynchronizedMineverseChatPlayer getSynchronizedMineverseChatPlayer(UUID uuid) {
-        return proxyPlayerMap.get(uuid);
-    }
 }

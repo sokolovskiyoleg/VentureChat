@@ -5,10 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +23,6 @@ import org.bukkit.scheduler.BukkitScheduler;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import mineverse.Aust1n46.chat.alias.Alias;
 import mineverse.Aust1n46.chat.api.MineverseChatAPI;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
@@ -42,7 +39,6 @@ import mineverse.Aust1n46.chat.listeners.ChatListener;
 import mineverse.Aust1n46.chat.listeners.CommandListener;
 import mineverse.Aust1n46.chat.listeners.LoginListener;
 import mineverse.Aust1n46.chat.listeners.PacketListenerLegacyChat;
-import mineverse.Aust1n46.chat.listeners.SignListener;
 import mineverse.Aust1n46.chat.localization.Localization;
 import mineverse.Aust1n46.chat.localization.LocalizedMessage;
 import mineverse.Aust1n46.chat.utilities.Format;
@@ -174,7 +170,6 @@ public class MineverseChat extends JavaPlugin implements PluginMessageListener {
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(new Channel(), this);
 		pluginManager.registerEvents(new ChatListener(), this);
-		pluginManager.registerEvents(new SignListener(), this);
 		pluginManager.registerEvents(new CommandListener(), this);
 		pluginManager.registerEvents(new LoginListener(), this);
 		if (VersionHandler.isUnder_1_19()) {

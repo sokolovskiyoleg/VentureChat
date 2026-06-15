@@ -1,7 +1,5 @@
 package mineverse.Aust1n46.chat.command.chat;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,20 +48,7 @@ public class Removemessage extends Command {
 			sender.sendMessage(LocalizedMessage.INVALID_HASH.toString());
 			return true;
 		}
-		if (args.length > 1 && ChatChannel.isChannel(args[1]) && sender instanceof Player) {
-			ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-			DataOutputStream out = new DataOutputStream(byteOutStream);
-			try {
-				out.writeUTF("RemoveMessage");
-				out.writeUTF(String.valueOf(hash));
-				((Player) sender).sendPluginMessage(plugin, MineverseChat.PLUGIN_MESSAGING_CHANNEL, byteOutStream.toByteArray());
-				out.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return true;
-		} else {
-			new BukkitRunnable() {
+		new BukkitRunnable() {
 				public void run() {
 					final Map<Player, List<PacketContainer>> packets = new HashMap();
 					for (MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
@@ -118,7 +103,6 @@ public class Removemessage extends Command {
 				}
 			}.runTaskAsynchronously(plugin);
 			return true;
-		}
 	}
 
 	public WrappedChatComponent getMessageDeletedChatComponentPlayer() {

@@ -1,29 +1,20 @@
 package mineverse.Aust1n46.chat;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
 
 import mineverse.Aust1n46.chat.alias.Alias;
 import mineverse.Aust1n46.chat.api.MineverseChatAPI;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
-import mineverse.Aust1n46.chat.api.events.VentureChatEvent;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
 import mineverse.Aust1n46.chat.channel.ChatChannelInfo;
 import mineverse.Aust1n46.chat.command.VentureCommandExecutor;
@@ -46,10 +37,7 @@ import net.milkbowl.vault.permission.Permission;
  *
  * @author Aust1n46
  */
-public class MineverseChat extends JavaPlugin implements PluginMessageListener {
-	// Plugin Messaging Channel
-	public static final String PLUGIN_MESSAGING_CHANNEL = "venturechat:data";
-	
+public class MineverseChat extends JavaPlugin {
 	// Event constants
 	public static final boolean ASYNC = true;
 	public static final boolean SYNC = false;
@@ -207,122 +195,4 @@ public class MineverseChat extends JavaPlugin implements PluginMessageListener {
 		return permission;
 	}
 
-	public static void sendPluginMessage(ByteArrayOutputStream byteOutStream) {
-		if(MineverseChatAPI.getOnlineMineverseChatPlayers().size() > 0) {
-			MineverseChatAPI.getOnlineMineverseChatPlayers().iterator().next().getPlayer().sendPluginMessage(getInstance(), PLUGIN_MESSAGING_CHANNEL, byteOutStream.toByteArray());
-		}
-	}
-	
-	public static void sendDiscordSRVPluginMessage(String chatChannel, String message) {
-		if(MineverseChatAPI.getOnlineMineverseChatPlayers().size() == 0) {
-			return;
-		}
-		ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream(byteOutStream);
-		try {
-			out.writeUTF("DiscordSRV");
-			out.writeUTF(chatChannel);
-			out.writeUTF(message);
-			sendPluginMessage(byteOutStream);
-			out.close();
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void onPluginMessageReceived(String channel, Player player, byte[] inputStream) {
-		if(!channel.equals(PLUGIN_MESSAGING_CHANNEL)) {
-			return;
-		}
-		try {
-			DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(inputStream));
-			if(getConfig().getString("loglevel", "info").equals("debug")) {
-				System.out.println(msgin.available() + " size on receiving end");
-			}
-			String subchannel = msgin.readUTF();
-			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			DataOutputStream out = new DataOutputStream(stream);
-			if(subchannel.equals("Chat")) {
-				String server = msgin.readUTF();
-				String chatchannel = msgin.readUTF();
-				String senderName = msgin.readUTF();
-				UUID senderUUID = UUID.fromString(msgin.readUTF());
-				int hash = msgin.readInt();
-				String format = msgin.readUTF();
-				String chat = msgin.readUTF();
-				String consoleChat = format + chat;
-				String globalJSON = msgin.readUTF();
-				String primaryGroup = msgin.readUTF();
-				String nickname = msgin.readUTF();
-				
-				if(!ChatChannel.isChannel(chatchannel)) {
-					return;
-				}
-				ChatChannel chatChannelObject = ChatChannel.getChannel(chatchannel);
-				
-				Set<Player> recipients = new HashSet<Player>();
-				
-				Bukkit.getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
-					@Override
-					public void run() {
-						//Create VentureChatEvent
-						VentureChatEvent ventureChatEvent = new VentureChatEvent(null, senderName, nickname, primaryGroup, chatChannelObject, recipients, recipients.size(), format, chat, globalJSON, hash, false);
-						//Fire event and wait for other plugin listeners to act on it
-						Bukkit.getServer().getPluginManager().callEvent(ventureChatEvent);
-					}
-				});
-				
-				Bukkit.getConsoleSender().sendMessage(consoleChat);
-				
-				if(Database.isEnabled()) {
-					Database.writeVentureChat(senderUUID.toString(), senderName, server, chatchannel, chat.replace("'", "''"), "Chat");
-				}
-				
-				for(MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
-					String json = Format.formatModerationGUI(globalJSON, p.getPlayer(), senderName, chatchannel, hash);
-					PacketContainer packet = Format.createPacketPlayOutChat(json);
-
-					if(getConfig().getBoolean("ignorechat", false)) {
-						if(!p.getIgnores().contains(senderUUID)) {
-							// System.out.println("Chat sent");
-							Format.sendPacketPlayOutChat(p.getPlayer(), packet);
-						}
-						continue;
-					}
-					Format.sendPacketPlayOutChat(p.getPlayer(), packet);
-				}
-			}
-			if(subchannel.equals("DiscordSRV")) {
-				String chatChannel = msgin.readUTF();
-				String message = msgin.readUTF();
-				if(!ChatChannel.isChannel(chatChannel)) {
-					return;
-				}
-				ChatChannel chatChannelObj = ChatChannel.getChannel(chatChannel);
-				if(!chatChannelObj.getBungee()) {
-					return;
-				}
-				String json = Format.convertPlainTextToJson(message, true);
-				int hash = (message.replaceAll("([�]([a-z0-9]))", "")).hashCode();
-				
-				for(MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
-					String finalJSON = Format.formatModerationGUI(json, p.getPlayer(), "Discord", chatChannelObj.getName(), hash);
-					PacketContainer packet = Format.createPacketPlayOutChat(finalJSON);
-					Format.sendPacketPlayOutChat(p.getPlayer(), packet);
-				}	
-			}
-			if(subchannel.equals("PlayerNames")) {
-				MineverseChatAPI.clearNetworkPlayerNames();
-				int playerCount = msgin.readInt();
-				for(int a = 0; a < playerCount; a ++) {
-					MineverseChatAPI.addNetworkPlayerName(msgin.readUTF());
-				}
-			}
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
 }

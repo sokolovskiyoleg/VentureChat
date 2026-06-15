@@ -1,15 +1,13 @@
 package mineverse.Aust1n46.chat.command.message;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import mineverse.Aust1n46.chat.MineverseChat;
@@ -143,13 +141,14 @@ public class Message extends Command {
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String label, String[] args) {
-		if (plugin.getConfig().getBoolean("bungeecordmessaging", true)) {
+		if (args.length == 1) {
 			List<String> completions = new ArrayList<>();
-			StringUtil.copyPartialMatches(args[args.length - 1], MineverseChatAPI.getNetworkPlayerNames(), completions);
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				completions.add(player.getName());
+			}
 			Collections.sort(completions);
 			return completions;
 		}
 		return super.tabComplete(sender, label, args);
 	}
-
 }

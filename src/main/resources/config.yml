@@ -171,20 +171,6 @@ jsonformatting:
 # Permissions are the name of the button and automatically include "venturechat." 
 # Example: mute equals venturechat.mute
 venturegui:
-  mute:
-    icon: 'REDSTONE_BLOCK'
-    durability: 0
-    text: '&cMute {player_name} &410m'
-    permission: 'mute'
-    command: '/mute {channel} {player_name} 10m'
-    slot: 1
-  unmute:
-    icon: 'DIAMOND_BLOCK'
-    durability: 0
-    text: '&bUnmute {player_name}'
-    permission: 'mute'
-    command: '/unmute {channel} {player_name} '
-    slot: 2
   removemessage:
     icon: 'DIAMOND_AXE'
     durability: 0

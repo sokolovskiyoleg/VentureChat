@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import mineverse.Aust1n46.chat.api.MineverseChatAPI;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
-import mineverse.Aust1n46.chat.command.mute.MuteContainer;
 
 public class Chatinfo extends Command {
 	public Chatinfo() {
@@ -33,10 +32,6 @@ public class Chatinfo extends Command {
 					for (String c : mcp.getListening()) {
 						ChatChannel channel = ChatChannel.getChannel(c);
 						listen += channel.getColor() + channel.getName() + " ";
-					}
-					for (MuteContainer muteContainer : mcp.getMutes()) {
-						ChatChannel channel = ChatChannel.getChannel(muteContainer.getChannel());
-						mute += channel.getColor() + channel.getName() + " ";
 					}
 					for (String bc : mcp.getBlockedCommands()) {
 						blockedcommands += bc + " ";
@@ -89,10 +84,6 @@ public class Chatinfo extends Command {
 				for (String c : p.getListening()) {
 					ChatChannel channel = ChatChannel.getChannel(c);
 					listen += channel.getColor() + channel.getName() + " ";
-				}
-				for (MuteContainer muteContainer : p.getMutes()) {
-					ChatChannel channel = ChatChannel.getChannel(muteContainer.getChannel());
-					mute += channel.getColor() + channel.getName() + " ";
 				}
 				for (String bc : p.getBlockedCommands()) {
 					blockedcommands += bc + " ";

@@ -45,23 +45,6 @@ public class Chwho extends Command {
 						}
 					}
 
-					if (channel.getBungee() && sender instanceof Player) {
-						MineverseChatPlayer mcp = MineverseChatAPI.getOnlineMineverseChatPlayer((Player) sender);
-						ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-						DataOutputStream out = new DataOutputStream(byteOutStream);
-						try {
-							out.writeUTF("Chwho");
-							out.writeUTF("Get");
-							out.writeUTF(mcp.getUUID().toString());
-							out.writeUTF(channel.getName());
-							mcp.getPlayer().sendPluginMessage(plugin, MineverseChat.PLUGIN_MESSAGING_CHANNEL, byteOutStream.toByteArray());
-							out.close();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						return true;
-					}
-
 					PluginManager pluginManager = plugin.getServer().getPluginManager();
 					long linecount = LINE_LENGTH;
 					for (MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
@@ -87,11 +70,7 @@ public class Chwho extends Command {
 												playerlist += "\n";
 												linecount = linecount + LINE_LENGTH;
 											}
-											if (!p.isMuted(channel.getName())) {
-												playerlist += ChatColor.WHITE + p.getName();
-											} else {
-												playerlist += ChatColor.RED + p.getName();
-											}
+											playerlist += ChatColor.WHITE + p.getName();
 											playerlist += ChatColor.WHITE + ", ";
 											break;
 										} else if (!r.hasTown()) {
@@ -108,11 +87,7 @@ public class Chwho extends Command {
 												playerlist += "\n";
 												linecount = linecount + LINE_LENGTH;
 											}
-											if (!p.isMuted(channel.getName())) {
-												playerlist += ChatColor.WHITE + p.getName();
-											} else {
-												playerlist += ChatColor.RED + p.getName();
-											}
+											playerlist += ChatColor.WHITE + p.getName();
 											playerlist += ChatColor.WHITE + ", ";
 											break;
 										} else if (!r.hasNation()) {
@@ -135,11 +110,7 @@ public class Chwho extends Command {
 												playerlist += "\n";
 												linecount = linecount + LINE_LENGTH;
 											}
-											if (!p.isMuted(channel.getName())) {
-												playerlist += ChatColor.WHITE + p.getName();
-											} else {
-												playerlist += ChatColor.RED + p.getName();
-											}
+											playerlist += ChatColor.WHITE + p.getName();
 											playerlist += ChatColor.WHITE + ", ";
 											break;
 										} else if (!mplayerp.hasFaction()) {
@@ -156,11 +127,7 @@ public class Chwho extends Command {
 								playerlist += "\n";
 								linecount = linecount + LINE_LENGTH;
 							}
-							if (!p.isMuted(channel.getName())) {
-								playerlist += ChatColor.WHITE + p.getName();
-							} else {
-								playerlist += ChatColor.RED + p.getName();
-							}
+							playerlist += ChatColor.WHITE + p.getName();
 							playerlist += ChatColor.WHITE + ", ";
 						}
 					}

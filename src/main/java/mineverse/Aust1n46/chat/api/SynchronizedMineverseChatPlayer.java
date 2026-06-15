@@ -8,22 +8,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import mineverse.Aust1n46.chat.command.mute.MuteContainer;
-
 public class SynchronizedMineverseChatPlayer {
     private UUID uuid;
     private Set<String> listening;
-    private HashMap<String, MuteContainer> mutes;
     private Set<UUID> ignores;
     private int messagePackets;
     private List<String> messageData = new ArrayList<String>();
     private boolean spy;
     private boolean messageToggle;
 
-    public SynchronizedMineverseChatPlayer(UUID uuid, Set<String> listening, HashMap<String, MuteContainer> mutes, Set<UUID> ignores, boolean spy, boolean messageToggle) {
+    public SynchronizedMineverseChatPlayer(UUID uuid, Set<String> listening, Set<UUID> ignores, boolean spy, boolean messageToggle) {
         this.uuid = uuid;
         this.listening = listening;
-        this.mutes = mutes;
         this.ignores = ignores;
         this.spy = spy;
         this.messageToggle = messageToggle;
@@ -32,7 +28,6 @@ public class SynchronizedMineverseChatPlayer {
     public SynchronizedMineverseChatPlayer(UUID uuid) {
         this.uuid = uuid;
         listening = new HashSet<String>();
-        mutes = new HashMap<String, MuteContainer>();
         ignores = new HashSet<UUID>();
         spy = false;
         messageToggle = true;
@@ -72,18 +67,6 @@ public class SynchronizedMineverseChatPlayer {
 
     public Set<UUID> getIgnores() {
         return this.ignores;
-    }
-
-    public void addMute(String channel, long time, String reason) {
-        mutes.put(channel, new MuteContainer(channel, time, reason));
-    }
-
-    public void clearMutes() {
-        this.mutes.clear();
-    }
-
-    public Collection<MuteContainer> getMutes() {
-        return this.mutes.values();
     }
 
     public void addListening(String channel) {

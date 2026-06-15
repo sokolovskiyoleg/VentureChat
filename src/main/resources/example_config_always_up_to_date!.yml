@@ -293,13 +293,11 @@ channels:
   Global:
     color: dark_green
     chatcolor: dark_green
-    mutable: true
     filter: true
     autojoin: true
     default: true
     distance: 0
     cooldown: 0
-    bungeecord: false
     alias: g
     permissions: None
     speak_permissions: None
@@ -308,13 +306,11 @@ channels:
   Network:
     color: gold
     chatcolor: gold
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 3
-    bungeecord: true
     alias: be
     permissions: None
     speak_permissions: None
@@ -323,13 +319,11 @@ channels:
   Announcement:
     color: red
     chatcolor: red
-    mutable: false
     filter: false
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: true
     alias: announce
     permissions: None
     speak_permissions: announcement
@@ -338,13 +332,11 @@ channels:
   Staff:
     color: green
     chatcolor: green
-    mutable: false
     filter: false
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
     alias: st
     permissions: staffchannel
     speak_permissions: None
@@ -353,13 +345,11 @@ channels:
   Donator:
     color: light_purple
     chatcolor: light_purple
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
     alias: d
     permissions: donatorchannel
     speak_permissions: None
@@ -368,13 +358,11 @@ channels:
   Help:
     color: aqua
     chatcolor: aqua
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
     alias: h
     permissions: None
     speak_permissions: None
@@ -383,13 +371,11 @@ channels:
   Trade:
     color: dark_aqua
     chatcolor: dark_aqua
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
     alias: t
     permissions: None
     speak_permissions: None
@@ -398,13 +384,11 @@ channels:
   Local:
     color: yellow
     chatcolor: yellow
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 230
     cooldown: 0
-    bungeecord: false
     alias: l
     permissions: None
     speak_permissions: None

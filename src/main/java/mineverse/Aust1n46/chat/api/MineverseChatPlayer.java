@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 
 import mineverse.Aust1n46.chat.ChatMessage;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
-import mineverse.Aust1n46.chat.command.mute.MuteContainer;
 import mineverse.Aust1n46.chat.json.JsonFormat;
 
 /**
@@ -27,7 +26,6 @@ public class MineverseChatPlayer {
 	private ChatChannel currentChannel;
 	private Set<UUID> ignores;
 	private Set<String> listening;
-	private HashMap<String, MuteContainer> mutes;
 	private Set<String> blockedCommands;
 	private boolean host;
 	private UUID party;
@@ -52,20 +50,18 @@ public class MineverseChatPlayer {
 	private int editHash;
 	private boolean rangedSpy;
 	private boolean messageToggle;
-	private boolean bungeeToggle;
 	
 	@Deprecated
-	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, HashMap<String, MuteContainer> mutes, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String nickname, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle, boolean bungeeToggle) {
-		this(uuid, name, currentChannel, ignores, listening, mutes, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle, bungeeToggle);
+	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String nickname, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
+		this(uuid, name, currentChannel, ignores, listening, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
 	}
 	
-	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, HashMap<String, MuteContainer> mutes, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle, boolean bungeeToggle) {
+	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
 		this.uuid = uuid;
 		this.name = name;
 		this.currentChannel = currentChannel;
 		this.ignores = ignores;
 		this.listening = listening;
-		this.mutes = mutes;
 		this.blockedCommands = blockedCommands;
 		this.host = host;
 		this.party = party;
@@ -88,7 +84,6 @@ public class MineverseChatPlayer {
 		this.cooldowns = new HashMap<ChatChannel, Long>();
 		this.spam = new HashMap<ChatChannel, List<Long>>();
 		this.messageToggle = messageToggle;
-		this.bungeeToggle = bungeeToggle;
 	}
 	
 	public MineverseChatPlayer(UUID uuid, String name) {
@@ -98,7 +93,6 @@ public class MineverseChatPlayer {
 		this.ignores = new HashSet<UUID>();
 		this.listening = new HashSet<String>();
 		listening.add(currentChannel.getName());
-		this.mutes = new HashMap<String, MuteContainer>();
 		this.blockedCommands = new HashSet<String>();
 		this.host = false;
 		this.party = null;
@@ -121,7 +115,6 @@ public class MineverseChatPlayer {
 		this.cooldowns = new HashMap<ChatChannel, Long>();
 		this.spam = new HashMap<ChatChannel, List<Long>>();
 		this.messageToggle = true;
-		this.bungeeToggle = true;
 	}
 	
 	@Deprecated
@@ -135,14 +128,6 @@ public class MineverseChatPlayer {
 	@Deprecated
 	public boolean hasNickname() {
 		return false;
-	}
-	
-	public boolean getBungeeToggle() {
-		return this.bungeeToggle;
-	}
-	
-	public void setBungeeToggle(boolean bungeeToggle) {
-		this.bungeeToggle = bungeeToggle;
 	}
 	
 	public boolean getMessageToggle() {
@@ -259,46 +244,6 @@ public class MineverseChatPlayer {
 
 	public void clearListening() {
 		this.listening.clear();
-	}
-
-	public Collection<MuteContainer> getMutes() {
-		return this.mutes.values();
-	}
-	
-	public MuteContainer getMute(String channel) {
-		return mutes.get(channel);
-	}
-
-	public boolean addMute(String channel) {
-		return addMute(channel, 0, "");
-	}
-	
-	public boolean addMute(String channel, long time) {
-		return addMute(channel, time, "");
-	}
-	
-	public boolean addMute(String channel, String reason) {
-		return addMute(channel, 0, reason);
-	}
-	
-	public boolean addMute(String channel, long time, String reason) {
-		if(channel != null && time >= 0) {
-			mutes.put(channel, new MuteContainer(channel, time, reason));
-			return true;
-		}
-		return false;
-	}
-
-	public boolean removeMute(String channel) {
-		if(channel != null) {
-			mutes.remove(channel);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isMuted(String channel) {
-		return channel != null ? this.mutes.containsKey(channel) : false;
 	}
 
 	public Set<String> getBlockedCommands() {

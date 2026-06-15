@@ -68,9 +68,6 @@ public class Channel extends Command implements Listener {
 		mcp.addListening(channel.getName());
 		mcp.setCurrentChannel(channel);
 		mcp.getPlayer().sendMessage(event.getMessage());
-		if (channel.getBungee()) {
-			MineverseChat.synchronize(mcp, true);
-		}
 		return;
 	}
 }

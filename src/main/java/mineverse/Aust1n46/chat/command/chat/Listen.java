@@ -39,9 +39,6 @@ public class Listen extends Command {
 			mcp.addListening(channel.getName());
 			mcp.getPlayer()
 					.sendMessage(LocalizedMessage.LISTEN_CHANNEL.toString().replace("{channel_color}", channel.getColor() + "").replace("{channel_name}", channel.getName()));
-			if (channel.getBungee()) {
-				MineverseChat.synchronize(mcp, true);
-			}
 			return true;
 		}
 		mcp.getPlayer().sendMessage(LocalizedMessage.COMMAND_INVALID_ARGUMENTS.toString().replace("{command}", "/listen").replace("{args}", "[channel]"));

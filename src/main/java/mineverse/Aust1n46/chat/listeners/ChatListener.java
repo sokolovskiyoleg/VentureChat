@@ -27,7 +27,6 @@ import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
 import mineverse.Aust1n46.chat.api.events.ChannelJoinEvent;
 import mineverse.Aust1n46.chat.api.events.VentureChatEvent;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
-import mineverse.Aust1n46.chat.command.mute.MuteContainer;
 import mineverse.Aust1n46.chat.database.Database;
 import mineverse.Aust1n46.chat.localization.LocalizedMessage;
 import mineverse.Aust1n46.chat.utilities.Format;
@@ -206,50 +205,6 @@ public class ChatListener implements Listener {
 		Location diff;
 		Boolean filterthis = true;
 		mcp.addListening(eventChannel.getName());
-		if (mcp.isMuted(eventChannel.getName())) {
-			MuteContainer muteContainer = mcp.getMute(eventChannel.getName());
-			if (muteContainer.hasDuration()) {
-				long dateTimeMillis = System.currentTimeMillis();
-				long muteTimeMillis = muteContainer.getDuration();
-				long remainingMuteTime = muteTimeMillis - dateTimeMillis;
-				if (remainingMuteTime < 1000) {
-					remainingMuteTime = 1000;
-				}
-				String timeString = Format.parseTimeStringFromMillis(remainingMuteTime);
-				if(muteContainer.hasReason()) {
-					mcp.getPlayer()
-					.sendMessage(LocalizedMessage.CHANNEL_MUTED_TIMED_REASON.toString()
-							.replace("{channel_color}", eventChannel.getColor())
-							.replace("{channel_name}", eventChannel.getName())
-							.replace("{time}", timeString)
-							.replace("{reason}", muteContainer.getReason()));
-				}
-				else {
-					mcp.getPlayer()
-					.sendMessage(LocalizedMessage.CHANNEL_MUTED_TIMED.toString()
-							.replace("{channel_color}", eventChannel.getColor())
-							.replace("{channel_name}", eventChannel.getName())
-							.replace("{time}", timeString));
-				}
-			}
-			else {
-				if(muteContainer.hasReason()) {
-					mcp.getPlayer()
-					.sendMessage(LocalizedMessage.CHANNEL_MUTED_REASON.toString()
-							.replace("{channel_color}", eventChannel.getColor())
-							.replace("{channel_name}", eventChannel.getName())
-							.replace("{reason}", muteContainer.getReason()));
-				}
-				else {
-					mcp.getPlayer()
-							.sendMessage(LocalizedMessage.CHANNEL_MUTED.toString()
-									.replace("{channel_color}", eventChannel.getColor())
-									.replace("{channel_name}", eventChannel.getName()));
-				}
-			}
-			mcp.setQuickChat(false);
-			return;
-		}
 		Double chDistance = (double) 0;
 		String curColor = "";
 		if(eventChannel.hasPermission() && !mcp.getPlayer().hasPermission(eventChannel.getPermission())) {
@@ -265,7 +220,6 @@ public class ChatListener implements Listener {
 			return;
 		}
 		curColor = eventChannel.getChatColor();
-		bungee = eventChannel.getBungee();
 		
 		long dateTimeSeconds = System.currentTimeMillis() / Format.MILLISECONDS_PER_SECOND;
 		
@@ -300,33 +254,10 @@ public class ChatListener implements Listener {
 			long spamcount = mcp.getSpam().get(eventChannel).get(0);
 			long spamtime = mcp.getSpam().get(eventChannel).get(1);
 			long spamtimeconfig = plugin.getConfig().getConfigurationSection("antispam").getLong("spamnumber");
-			String mutedForTime = plugin.getConfig().getConfigurationSection("antispam").getString("mutetime", "0");
 			long dateTime = System.currentTimeMillis();
 			if (dateTimeSeconds < spamtime
 					+ plugin.getConfig().getConfigurationSection("antispam").getLong("spamtime")) {
 				if (spamcount + 1 >= spamtimeconfig) {
-					long time = Format.parseTimeStringToMillis(mutedForTime);
-					if (time > 0) {
-						mcp.addMute(eventChannel.getName(), dateTime + time, LocalizedMessage.SPAM_MUTE_REASON_TEXT.toString());
-						String timeString = Format.parseTimeStringFromMillis(time);
-						mcp.getPlayer()
-								.sendMessage(LocalizedMessage.MUTE_PLAYER_PLAYER_TIME_REASON.toString()
-										.replace("{channel_color}", eventChannel.getColor())
-										.replace("{channel_name}", eventChannel.getName())
-										.replace("{time}", timeString)
-										.replace("{reason}", LocalizedMessage.SPAM_MUTE_REASON_TEXT.toString()));
-					}
-					else {
-						mcp.addMute(eventChannel.getName(), LocalizedMessage.SPAM_MUTE_REASON_TEXT.toString());
-						mcp.getPlayer()
-								.sendMessage(LocalizedMessage.MUTE_PLAYER_PLAYER_REASON.toString()
-										.replace("{channel_color}", eventChannel.getColor())
-										.replace("{channel_name}", eventChannel.getName())
-										.replace("{reason}", LocalizedMessage.SPAM_MUTE_REASON_TEXT.toString()));
-					}
-					if(eventChannel.getBungee()) {
-						MineverseChat.synchronize(mcp, true);
-					}
 					mcp.getSpam().get(eventChannel).set(0, 0L);
 					mcp.setQuickChat(false);
 					return;
@@ -550,7 +481,6 @@ public class ChatListener implements Listener {
 				out.writeUTF(channel.getName());
 				out.writeUTF(mcp.getName());
 				out.writeUTF(mcp.getUUID().toString());
-				out.writeBoolean(mcp.getBungeeToggle());
 				out.writeInt(hash);
 				out.writeUTF(format);
 				out.writeUTF(chat);

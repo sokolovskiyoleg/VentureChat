@@ -50,7 +50,7 @@ public class Removemessage extends Command {
 			sender.sendMessage(LocalizedMessage.INVALID_HASH.toString());
 			return true;
 		}
-		if (args.length > 1 && ChatChannel.isChannel(args[1]) && ChatChannel.getChannel(args[1]).getBungee() && sender instanceof Player) {
+		if (args.length > 1 && ChatChannel.isChannel(args[1]) && sender instanceof Player) {
 			ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
 			DataOutputStream out = new DataOutputStream(byteOutStream);
 			try {

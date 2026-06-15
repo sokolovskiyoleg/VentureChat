@@ -34,7 +34,6 @@ public class ChatChannel {
 	private String name;
 	private String permission;
 	private String speakPermission;
-	private boolean mutable;
 	private String color;
 	private String chatColor;
 	private boolean defaultChannel;
@@ -43,7 +42,6 @@ public class ChatChannel {
 	private String quickSymbol;
 	private double distance;
 	private boolean filter;
-	private boolean bungee;
 	private String format;
 	private int cooldown;
 	private String prefix;
@@ -63,9 +61,7 @@ public class ChatChannel {
 			String name = key;
 			String permission = cs.getString(key + ".permissions", "None");
 			String speakPermission = cs.getString(key + ".speak_permissions", "None");
-			boolean mutable = cs.getBoolean(key + ".mutable", false);
 			boolean filter = cs.getBoolean(key + ".filter", true);
-			boolean bungee = cs.getBoolean(key + ".bungeecord", false);
 			String format = cs.getString(key + ".format", "Default");
 			boolean defaultChannel = cs.getBoolean(key + ".default", false);
 			String alias = cs.getString(key + ".alias", "None");
@@ -74,8 +70,8 @@ public class ChatChannel {
 			int cooldown = cs.getInt(key + ".cooldown", 0);
 			boolean autojoin = cs.getBoolean(key + ".autojoin", false);
 			String prefix = cs.getString(key + ".channel_prefix");
-			ChatChannel chatChannel = new ChatChannel(name, color, chatColor, permission, speakPermission, mutable,
-					filter, defaultChannel, alias, quickSymbol, distance, autojoin, bungee, cooldown, prefix, format);
+			ChatChannel chatChannel = new ChatChannel(name, color, chatColor, permission, speakPermission,
+					filter, defaultChannel, alias, quickSymbol, distance, autojoin, cooldown, prefix, format);
 			channels[counter++] = chatChannel;
 			chatChannels.put(name.toLowerCase(), chatChannel);
 			chatChannels.put(alias.toLowerCase(), chatChannel);
@@ -87,8 +83,8 @@ public class ChatChannel {
 		// Error handling for missing default channel in the config.
 		if(defaultChatChannel == null) {
 			Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&e - &cNo default channel found!"));
-			defaultChatChannel = new ChatChannel("MissingDefault", "red", "red", "None", "None", false,
-					true, true, "md", "None", 0, true, false, 0, "&f[&cMissingDefault&f]", "{venturechat_channel_prefix} {vault_prefix}{player_displayname}&c:");
+			defaultChatChannel = new ChatChannel("MissingDefault", "red", "red", "None", "None", true,
+					true, "md", "None", 0, true, 0, "&f[&cMissingDefault&f]", "{venturechat_channel_prefix} {vault_prefix}{player_displayname}&c:");
 			defaultColor = defaultChatChannel.getColor();
 			chatChannels.put("missingdefault", defaultChatChannel);
 			chatChannels.put("md", defaultChatChannel);
@@ -137,6 +133,16 @@ public class ChatChannel {
 	}
 
 	/**
+	 * Check if the chat channel is BungeeCord enabled.
+	 *
+	 * @return {@link Boolean#TRUE} if the chat channel is BungeeCord enabled,
+	 *         {@link Boolean#FALSE} otherwise.
+	 */
+	public Boolean getBungee() {
+		return false;
+	}
+
+	/**
 	 * Get default chat channel color.
 	 * 
 	 * @return {@link String}
@@ -177,32 +183,28 @@ public class ChatChannel {
 	 * @param chatColor
 	 * @param permission
 	 * @param speakPermission
-	 * @param mutable
 	 * @param filter
 	 * @param defaultChannel
 	 * @param alias
 	 * @param distance
 	 * @param autojoin
-	 * @param bungee
 	 * @param cooldown
 	 * @param format
 	 */
 	public ChatChannel(String name, String color, String chatColor, String permission, String speakPermission,
-			boolean mutable, boolean filter, boolean defaultChannel, String alias, String quickSymbol, double distance, boolean autojoin,
-			boolean bungee, int cooldown, String prefix, String format) {
+			boolean filter, boolean defaultChannel, String alias, String quickSymbol, double distance, boolean autojoin,
+			int cooldown, String prefix, String format) {
 		this.name = name;
 		this.color = color;
 		this.chatColor = chatColor;
 		this.permission = PERMISSION_PREFIX + permission;
 		this.speakPermission = PERMISSION_PREFIX + speakPermission;
-		this.mutable = mutable;
 		this.filter = filter;
 		this.defaultChannel = defaultChannel;
 		this.alias = alias;
 		this.quickSymbol = quickSymbol;
 		this.distance = distance;
 		this.autojoin = autojoin;
-		this.bungee = bungee;
 		this.cooldown = cooldown;
 		this.format = format;
 		this.prefix = prefix;
@@ -216,32 +218,28 @@ public class ChatChannel {
 	 * @param chatColor
 	 * @param permission
 	 * @param speakPermission
-	 * @param mutable
 	 * @param filter
 	 * @param defaultChannel
 	 * @param alias
 	 * @param distance
 	 * @param autojoin
-	 * @param bungee
 	 * @param cooldown
 	 * @param format
 	 */
 	@Deprecated
 	public ChatChannel(String name, String color, String chatColor, String permission, String speakPermission,
-			Boolean mutable, Boolean filter, Boolean defaultChannel, String alias, Double distance, Boolean autojoin,
-			Boolean bungee, int cooldown, String format) {
+			Boolean filter, Boolean defaultChannel, String alias, Double distance, Boolean autojoin,
+			int cooldown, String format) {
 		this.name = name;
 		this.color = color;
 		this.chatColor = chatColor;
 		this.permission = PERMISSION_PREFIX + permission;
 		this.speakPermission = PERMISSION_PREFIX + speakPermission;
-		this.mutable = mutable;
 		this.filter = filter;
 		this.defaultChannel = defaultChannel;
 		this.alias = alias;
 		this.distance = distance;
 		this.autojoin = autojoin;
-		this.bungee = bungee;
 		this.cooldown = cooldown;
 		this.format = format;
 	}
@@ -282,16 +280,6 @@ public class ChatChannel {
 	}
 
 	/**
-	 * Check if the chat channel is BungeeCord enabled.
-	 * 
-	 * @return {@link Boolean#TRUE} if the chat channel is BungeeCord enabled,
-	 *         {@link Boolean#FALSE} otherwise.
-	 */
-	public Boolean getBungee() {
-		return Boolean.valueOf(bungee);
-	}
-
-	/**
 	 * Get the permissions node for the chat channel.
 	 * 
 	 * @return {@link String}
@@ -308,16 +296,6 @@ public class ChatChannel {
 	 */
 	public Boolean getAutojoin() {
 		return Boolean.valueOf(autojoin);
-	}
-
-	/**
-	 * Check if the chat channel allows muting.
-	 * 
-	 * @return {@link Boolean#TRUE} if muting is allowed, {@link Boolean#FALSE}
-	 *         otherwise.
-	 */
-	public Boolean isMutable() {
-		return Boolean.valueOf(mutable);
 	}
 
 	/**

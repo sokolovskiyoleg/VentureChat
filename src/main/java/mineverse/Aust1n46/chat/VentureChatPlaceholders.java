@@ -38,8 +38,6 @@ public class VentureChatPlaceholders extends PlaceholderExpansion {
                     return currentChannel.getColor();
                 case "channel_chatcolor":
                     return currentChannel.getChatColor();
-                case "channel_is_bungee":
-                    return currentChannel.getBungee() ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
                 case "channel_cooldown":
                     return currentChannel.getCooldown() + "";
                 case "channel_distance":

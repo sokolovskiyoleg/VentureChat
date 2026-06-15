@@ -41,9 +41,6 @@ public class Setchannelall extends Command {
 				} else {
 					player.addListening(channel.getName());
 				}
-				if (channel.getBungee()) {
-					isThereABungeeChannel = true;
-				}
 			}
 			sender.sendMessage(LocalizedMessage.SET_CHANNEL_ALL_SENDER.toString().replace("{player}", player.getName()));
 			if (player.isOnline())

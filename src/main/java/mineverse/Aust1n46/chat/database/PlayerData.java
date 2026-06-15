@@ -22,7 +22,6 @@ import mineverse.Aust1n46.chat.MineverseChat;
 import mineverse.Aust1n46.chat.api.MineverseChatAPI;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
-import mineverse.Aust1n46.chat.command.mute.MuteContainer;
 import mineverse.Aust1n46.chat.utilities.Format;
 import mineverse.Aust1n46.chat.utilities.UUIDFetcher;
 
@@ -66,19 +65,6 @@ public class PlayerData {
                         listening.add(channel);
                     }
                 }
-                HashMap<String, MuteContainer> mutes = new HashMap<String, MuteContainer>();
-                StringTokenizer m = new StringTokenizer(playerData.getConfigurationSection("players." + uuidString).getString("mutes"), ",");
-                while (m.hasMoreTokens()) {
-                    String[] parts = m.nextToken().split(":");
-                    if (ChatChannel.isChannel(parts[0])) {
-                        if (parts[1].equals("null")) {
-                            Bukkit.getConsoleSender().sendMessage("[VentureChat] Null Mute Time: " + parts[0] + " " + name);
-                            continue;
-                        }
-                        String channelName = parts[0];
-                        mutes.put(channelName, new MuteContainer(channelName, Long.parseLong(parts[1])));
-                    }
-                }
                 Set<String> blockedCommands = new HashSet<String>();
                 StringTokenizer b = new StringTokenizer(playerData.getConfigurationSection("players." + uuidString).getString("blockedcommands"), ",");
                 while (b.hasMoreTokens()) {
@@ -93,8 +79,7 @@ public class PlayerData {
                 boolean commandSpy = playerData.getConfigurationSection("players." + uuidString).getBoolean("commandspy", false);
                 boolean rangedSpy = playerData.getConfigurationSection("players." + uuidString).getBoolean("rangedspy", false);
                 boolean messageToggle = playerData.getConfigurationSection("players." + uuidString).getBoolean("messagetoggle", true);
-                boolean bungeeToggle = playerData.getConfigurationSection("players." + uuidString).getBoolean("bungeetoggle", true);
-                MineverseChatPlayer mcp = new MineverseChatPlayer(uuid, name, currentChannel, ignores, listening, mutes, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle, bungeeToggle);
+                MineverseChatPlayer mcp = new MineverseChatPlayer(uuid, name, currentChannel, ignores, listening, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
                 mcp.setModified(true);
                 MineverseChatAPI.addMineverseChatPlayerToMap(mcp);
                 MineverseChatAPI.addNameToMap(mcp);
@@ -160,12 +145,6 @@ public class PlayerData {
                     listening.add(channel);
                 }
             }
-            HashMap<String, MuteContainer> mutes = new HashMap<String, MuteContainer>();
-            ConfigurationSection muteSection = playerDataFileYamlConfiguration.getConfigurationSection("mutes");
-            for (String channelName : muteSection.getKeys(false)) {
-                ConfigurationSection channelSection = muteSection.getConfigurationSection(channelName);
-                mutes.put(channelName, new MuteContainer(channelName, channelSection.getLong("time"), channelSection.getString("reason")));
-            }
 
             Set<String> blockedCommands = new HashSet<String>();
             StringTokenizer b = new StringTokenizer(playerDataFileYamlConfiguration.getString("blockedcommands"), ",");
@@ -181,8 +160,7 @@ public class PlayerData {
             boolean commandSpy = playerDataFileYamlConfiguration.getBoolean("commandspy", false);
             boolean rangedSpy = playerDataFileYamlConfiguration.getBoolean("rangedspy", false);
             boolean messageToggle = playerDataFileYamlConfiguration.getBoolean("messagetoggle", true);
-            boolean bungeeToggle = playerDataFileYamlConfiguration.getBoolean("bungeetoggle", true);
-            mcp = new MineverseChatPlayer(uuid, name, currentChannel, ignores, listening, mutes, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle, bungeeToggle);
+            mcp = new MineverseChatPlayer(uuid, name, currentChannel, ignores, listening, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
         } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - Error Loading Data File: " + playerDataFile.getName()));
             Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - File will be skipped and deleted."));
@@ -227,13 +205,6 @@ public class PlayerData {
             }
             playerDataFileYamlConfiguration.set("listen", listening);
 
-            ConfigurationSection muteSection = playerDataFileYamlConfiguration.createSection("mutes");
-            for (MuteContainer mute : mcp.getMutes()) {
-                ConfigurationSection channelSection = muteSection.createSection(mute.getChannel());
-                channelSection.set("time", mute.getDuration());
-                channelSection.set("reason", mute.getReason());
-            }
-
             playerDataFileYamlConfiguration.set("blockedcommands", blockedCommands);
             playerDataFileYamlConfiguration.set("host", mcp.isHost());
             playerDataFileYamlConfiguration.set("party", mcp.hasParty() ? mcp.getParty().toString() : "");
@@ -243,7 +214,6 @@ public class PlayerData {
             playerDataFileYamlConfiguration.set("commandspy", mcp.hasCommandSpy());
             playerDataFileYamlConfiguration.set("rangedspy", mcp.getRangedSpy());
             playerDataFileYamlConfiguration.set("messagetoggle", mcp.getMessageToggle());
-            playerDataFileYamlConfiguration.set("bungeetoggle", mcp.getBungeeToggle());
             Calendar currentDate = Calendar.getInstance();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");
             String dateNow = formatter.format(currentDate.getTime());

@@ -72,15 +72,5 @@ public class LoginListener implements Listener {
 				mcp.addListening(ch.getName());
 			}
 		}
-
-		if (MineverseChat.isConnectedToProxy()) {
-			long delayInTicks = 20L;
-			final MineverseChatPlayer sync = mcp;
-			plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
-				public void run() {
-					MineverseChat.synchronize(sync, false);
-				}
-			}, delayInTicks);
-		}
 	}
 }

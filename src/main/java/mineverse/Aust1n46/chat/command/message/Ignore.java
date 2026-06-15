@@ -80,7 +80,6 @@ public class Ignore extends Command {
 		if (mcp.getIgnores().contains(player.getUUID())) {
 			mcp.getPlayer().sendMessage(LocalizedMessage.IGNORE_PLAYER_OFF.toString().replace("{player}", player.getName()));
 			mcp.removeIgnore(player.getUUID());
-			MineverseChat.synchronize(mcp, true);
 			return true;
 		}
 		if (player.getPlayer().hasPermission("venturechat.ignore.bypass")) {
@@ -89,7 +88,6 @@ public class Ignore extends Command {
 		}
 		mcp.getPlayer().sendMessage(LocalizedMessage.IGNORE_PLAYER_ON.toString().replace("{player}", player.getName()));
 		mcp.addIgnore(player.getUUID());
-		MineverseChat.synchronize(mcp, true);
 		return true;
 	}
 

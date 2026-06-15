@@ -34,8 +34,6 @@ public class ChatChannel {
 	private String name;
 	private String permission;
 	private String speakPermission;
-	private String color;
-	private String chatColor;
 	private boolean defaultChannel;
 	private boolean autojoin;
 	private String alias;
@@ -56,8 +54,6 @@ public class ChatChannel {
 		channels = new ChatChannel[len];
 		int counter = 0;
 		for (String key : cs.getKeys(false)) {
-			String color = cs.getString(key + ".color", "white");
-			String chatColor = cs.getString(key + ".chatcolor", "white");
 			String name = key;
 			String permission = cs.getString(key + ".permissions", "None");
 			String speakPermission = cs.getString(key + ".speak_permissions", "None");
@@ -70,22 +66,20 @@ public class ChatChannel {
 			int cooldown = cs.getInt(key + ".cooldown", 0);
 			boolean autojoin = cs.getBoolean(key + ".autojoin", false);
 			String prefix = cs.getString(key + ".channel_prefix");
-			ChatChannel chatChannel = new ChatChannel(name, color, chatColor, permission, speakPermission,
+			ChatChannel chatChannel = new ChatChannel(name, permission, speakPermission,
 					filter, defaultChannel, alias, quickSymbol, distance, autojoin, cooldown, prefix, format);
 			channels[counter++] = chatChannel;
 			chatChannels.put(name.toLowerCase(), chatChannel);
 			chatChannels.put(alias.toLowerCase(), chatChannel);
 			if (defaultChannel) {
 				defaultChatChannel = chatChannel;
-				defaultColor = color;
 			}
 		}
 		// Error handling for missing default channel in the config.
 		if(defaultChatChannel == null) {
 			Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&e - &cNo default channel found!"));
-			defaultChatChannel = new ChatChannel("MissingDefault", "red", "red", "None", "None", true,
+			defaultChatChannel = new ChatChannel("MissingDefault",  "None", "None", true,
 					true, "md", "None", 0, true, 0, "&f[&cMissingDefault&f]", "{venturechat_channel_prefix} {vault_prefix}{player_displayname}&c:");
-			defaultColor = defaultChatChannel.getColor();
 			chatChannels.put("missingdefault", defaultChatChannel);
 			chatChannels.put("md", defaultChatChannel);
 		}
@@ -179,8 +173,6 @@ public class ChatChannel {
 	 * Parameterized constructor a {@link ChatChannel}.
 	 * 
 	 * @param name
-	 * @param color
-	 * @param chatColor
 	 * @param permission
 	 * @param speakPermission
 	 * @param filter
@@ -191,12 +183,10 @@ public class ChatChannel {
 	 * @param cooldown
 	 * @param format
 	 */
-	public ChatChannel(String name, String color, String chatColor, String permission, String speakPermission,
+	public ChatChannel(String name, String permission, String speakPermission,
 			boolean filter, boolean defaultChannel, String alias, String quickSymbol, double distance, boolean autojoin,
 			int cooldown, String prefix, String format) {
 		this.name = name;
-		this.color = color;
-		this.chatColor = chatColor;
 		this.permission = PERMISSION_PREFIX + permission;
 		this.speakPermission = PERMISSION_PREFIX + speakPermission;
 		this.filter = filter;
@@ -214,8 +204,6 @@ public class ChatChannel {
 	 * Deprecated parameterized constructor a {@link ChatChannel}.
 	 * 
 	 * @param name
-	 * @param color
-	 * @param chatColor
 	 * @param permission
 	 * @param speakPermission
 	 * @param filter
@@ -227,12 +215,10 @@ public class ChatChannel {
 	 * @param format
 	 */
 	@Deprecated
-	public ChatChannel(String name, String color, String chatColor, String permission, String speakPermission,
+	public ChatChannel(String name, String permission, String speakPermission,
 			Boolean filter, Boolean defaultChannel, String alias, Double distance, Boolean autojoin,
 			int cooldown, String format) {
 		this.name = name;
-		this.color = color;
-		this.chatColor = chatColor;
 		this.permission = PERMISSION_PREFIX + permission;
 		this.speakPermission = PERMISSION_PREFIX + speakPermission;
 		this.filter = filter;
@@ -296,59 +282,6 @@ public class ChatChannel {
 	 */
 	public Boolean getAutojoin() {
 		return Boolean.valueOf(autojoin);
-	}
-
-	/**
-	 * Get the formatted color of the chat channel.
-	 * 
-	 * @return {@link String}. Returns {@link Format#DEFAULT_COLOR_CODE} if the
-	 *         color is invalid.
-	 */
-	public String getColor() {
-		if (Format.isValidColor(color)) {
-			return String.valueOf(ChatColor.valueOf(color.toUpperCase()));
-		}
-		if (Format.isValidHexColor(color)) {
-			return Format.convertHexColorCodeToBukkitColorCode(color);
-		}
-		return Format.DEFAULT_COLOR_CODE;
-	}
-
-	/**
-	 * Get the raw color value of the chat channel.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getColorRaw() {
-		return color;
-	}
-
-	/**
-	 * Get the formatted chat color of the chat channel.
-	 * 
-	 * @return {@link String}. Returns {@link Format#DEFAULT_COLOR_CODE} if the chat
-	 *         color is invalid.
-	 */
-	public String getChatColor() {
-		if (chatColor.equalsIgnoreCase("None")) {
-			return chatColor;
-		}
-		if (Format.isValidColor(chatColor)) {
-			return String.valueOf(ChatColor.valueOf(chatColor.toUpperCase()));
-		}
-		if (Format.isValidHexColor(chatColor)) {
-			return Format.convertHexColorCodeToBukkitColorCode(chatColor);
-		}
-		return Format.DEFAULT_COLOR_CODE;
-	}
-
-	/**
-	 * Get the raw chat color value of the chat channel.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getChatColorRaw() {
-		return chatColor;
 	}
 
 	/**

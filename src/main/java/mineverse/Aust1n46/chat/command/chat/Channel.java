@@ -34,7 +34,7 @@ public class Channel extends Command implements Listener {
 			}
 			ChatChannel channel = ChatChannel.getChannel(args[0]);
 			Bukkit.getServer().getPluginManager().callEvent(new ChannelJoinEvent(mcp.getPlayer(), channel,
-					LocalizedMessage.SET_CHANNEL.toString().replace("{channel_color}", channel.getColor() + "").replace("{channel_name}", channel.getName())));
+					LocalizedMessage.SET_CHANNEL.toString().replace("{channel_name}", channel.getName())));
 			return true;
 		}
 		mcp.getPlayer().sendMessage(LocalizedMessage.COMMAND_INVALID_ARGUMENTS.toString().replace("{command}", "/channel").replace("{args}", "[channel]"));

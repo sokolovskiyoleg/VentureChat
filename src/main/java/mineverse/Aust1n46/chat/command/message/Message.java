@@ -38,11 +38,6 @@ public class Message extends Command {
 			return true;
 		}
 
-		if (plugin.getConfig().getBoolean("bungeecordmessaging", true)) {
-			sendBungeeCordMessage(mcp, command, args);
-			return true;
-		}
-
 		MineverseChatPlayer player = MineverseChatAPI.getOnlineMineverseChatPlayer(args[0]);
 		if (player == null) {
 			mcp.getPlayer().sendMessage(LocalizedMessage.PLAYER_OFFLINE.toString().replace("{args}", args[0]));
@@ -157,51 +152,4 @@ public class Message extends Command {
 		return super.tabComplete(sender, label, args);
 	}
 
-	private void sendBungeeCordMessage(MineverseChatPlayer mcp, String command, String[] args) {
-		if (args.length < 2) {
-			mcp.getPlayer().sendMessage(LocalizedMessage.COMMAND_INVALID_ARGUMENTS.toString().replace("{command}", "/" + command).replace("{args}", "[player] [message]"));
-			return;
-		}
-		ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream(byteOutStream);
-		StringBuilder msgBuilder = new StringBuilder();
-		for (int r = 1; r < args.length; r++) {
-			msgBuilder.append(" " + args[r]);
-		}
-		String msg = msgBuilder.toString();
-		if (mcp.hasFilter()) {
-			msg = Format.FilterChat(msg);
-		}
-		if (mcp.getPlayer().hasPermission("venturechat.color.legacy")) {
-			msg = Format.FormatStringLegacyColor(msg);
-		}
-		if (mcp.getPlayer().hasPermission("venturechat.color")) {
-			msg = Format.FormatStringColor(msg);
-		}
-		if (mcp.getPlayer().hasPermission("venturechat.format")) {
-			msg = Format.FormatString(msg);
-		}
-
-		String send = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), plugin.getConfig().getString("tellformatfrom").replaceAll("sender_", "")));
-		String echo = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), plugin.getConfig().getString("tellformatto").replaceAll("sender_", "")));
-		String spy = "VentureChat:NoSpy";
-		if (!mcp.getPlayer().hasPermission("venturechat.spy.override")) {
-			spy = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), plugin.getConfig().getString("tellformatspy").replaceAll("sender_", "")));
-		}
-		try {
-			out.writeUTF("Message");
-			out.writeUTF("Send");
-			out.writeUTF(args[0]);
-			out.writeUTF(mcp.getUUID().toString());
-			out.writeUTF(mcp.getName());
-			out.writeUTF(send);
-			out.writeUTF(echo);
-			out.writeUTF(spy);
-			out.writeUTF(msg);
-			mcp.getPlayer().sendPluginMessage(plugin, MineverseChat.PLUGIN_MESSAGING_CHANNEL, byteOutStream.toByteArray());
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 }

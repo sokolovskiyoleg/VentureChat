@@ -34,10 +34,6 @@ public class VentureChatPlaceholders extends PlaceholderExpansion {
                     return currentChannel.getName();
                 case "channel_alias":
                     return currentChannel.getAlias();
-                case "channel_color":
-                    return currentChannel.getColor();
-                case "channel_chatcolor":
-                    return currentChannel.getChatColor();
                 case "channel_cooldown":
                     return currentChannel.getCooldown() + "";
                 case "channel_distance":

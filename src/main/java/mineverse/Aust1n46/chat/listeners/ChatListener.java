@@ -219,7 +219,6 @@ public class ChatListener implements Listener {
 			mcp.setQuickChat(false);
 			return;
 		}
-		curColor = eventChannel.getChatColor();
 		
 		long dateTimeSeconds = System.currentTimeMillis() / Format.MILLISECONDS_PER_SECOND;
 		

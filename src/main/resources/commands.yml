@@ -18,24 +18,6 @@ commands:
     channel:
         aliases: [ch,vchannel,join]
         enabled: true
-    listen:
-        aliases: [lis,vlisten]
-        enabled: true
-    leave:
-        aliases: [lev,vleave]
-        enabled: true
-    chlist:
-        aliases: [chl,vchlist]
-        enabled: true
-    chwho:
-        aliases: [chw,vchwho]
-        enabled: true
-    setchannel:
-        aliases: [sc,vsetchannel]
-        enabled: true
-    setchannelall:
-        aliases: [sca,vsetchannelall]
-        enabled: true
     force:
         aliases: [for,vforce]
         enabled: true
@@ -47,12 +29,6 @@ commands:
         enabled: true
     commandspy:
         aliases: [comspy,vcommandspy]
-        enabled: true
-    chatinfo:
-        aliases: [ci,vchatinfo]
-        enabled: true
-    channelinfo:
-        aliases: [chi,vchannelinfo]
         enabled: true
     venturechat:
         aliases: [vc]
@@ -66,9 +42,6 @@ commands:
     broadcast:
         aliases: [bc,vbroadcast]
         enabled: true
-    commandblock:
-        aliases: [cb,vcommandblock]
-        enabled: true
     party:
         aliases: [p,chatparty,cp,vparty]
         enabled: true
@@ -78,24 +51,9 @@ commands:
     notifications:
         aliases: [notify,vnotify]
         enabled: true
-    removemessage:
-        aliases: [rm,vremovemessage]
-        enabled: true
     rangedspy:
         aliases: [rspy,vrangedspy]
-        enabled: true
-    venturechatgui:
-        aliases: [vchatgui]
         enabled: true
     messagetoggle:
         aliases: [mtoggle,vmessagetoggle]
         enabled: true
-    bungeetoggle:
-        aliases: [btoggle,vbungeetoggle]
-        enabled: true
-    config:
-        aliases: [vconfig]
-        enabled: false
-    edit:
-        aliases: [vedit]
-        enabled: false

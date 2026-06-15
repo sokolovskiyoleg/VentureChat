@@ -96,8 +96,8 @@ public class VentureChatGui extends Command {
 		skullMeta.setOwner(target.getName());
 		skullMeta.setDisplayName(ChatColor.AQUA + target.getName());
 		List<String> skullLore = new ArrayList<String>();
-		skullLore.add(ChatColor.GRAY + "Channel: " + channel.getColor() + channel.getName());
-		skullLore.add(ChatColor.GRAY + "Hash: " + channel.getColor() + hash);
+		skullLore.add(ChatColor.GRAY + "Channel: " + channel.getName());
+		skullLore.add(ChatColor.GRAY + "Hash: " +  hash);
 		skullMeta.setLore(skullLore);
 		skull.setItemMeta(skullMeta);
 		skull.setDurability((short) 3);
@@ -154,8 +154,8 @@ public class VentureChatGui extends Command {
 		skullMeta.setOwner("Scarsz");
 		skullMeta.setDisplayName("�bDiscord_Message");
 		List<String> skullLore = new ArrayList<String>();
-		skullLore.add("�7Channel: " + channel.getColor() + channel.getName());
-		skullLore.add("�7Hash: " + channel.getColor() + hash);
+		skullLore.add("�7Channel: " + channel.getName());
+		skullLore.add("�7Hash: " +  hash);
 		skullMeta.setLore(skullLore);
 		skull.setItemMeta(skullMeta);
 		skull.setDurability((short) 3);

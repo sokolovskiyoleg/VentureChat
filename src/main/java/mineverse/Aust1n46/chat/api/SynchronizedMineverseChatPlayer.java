@@ -1,8 +1,6 @@
 package mineverse.Aust1n46.chat.api;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

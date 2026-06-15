@@ -28,7 +28,7 @@ public class ChannelAlias extends Command {
 			if (commandLabel.toLowerCase().equals(channel.getAlias())) {
 				if (args.length == 0) {
 					mcp.getPlayer()
-							.sendMessage(LocalizedMessage.SET_CHANNEL.toString().replace("{channel_color}", channel.getColor() + "").replace("{channel_name}", channel.getName()));
+							.sendMessage(LocalizedMessage.SET_CHANNEL.toString().replace("{channel_name}", channel.getName()));
 					if (mcp.hasConversation()) {
 						for (MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
 							if (p.isSpy()) {

@@ -126,12 +126,7 @@ public class ChatChannel {
 		return getChannel(channelName) != null;
 	}
 
-	/**
-	 * Check if the chat channel is BungeeCord enabled.
-	 *
-	 * @return {@link Boolean#TRUE} if the chat channel is BungeeCord enabled,
-	 *         {@link Boolean#FALSE} otherwise.
-	 */
+	@Deprecated
 	public Boolean getBungee() {
 		return false;
 	}

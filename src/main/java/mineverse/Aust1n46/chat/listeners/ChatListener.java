@@ -1,7 +1,5 @@
 package mineverse.Aust1n46.chat.listeners;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.Set;
 
 import net.essentialsx.api.v2.services.discord.DiscordService;
@@ -55,7 +53,6 @@ public class ChatListener implements Listener {
 	}
 	
 	public void handleTrueAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
-		boolean bungee = false;
 		String chat = event.getMessage();
 		String format;
 		Set<Player> recipients = event.getRecipients();
@@ -235,7 +232,6 @@ public class ChatListener implements Listener {
 					mcp.getPlayer().sendMessage(LocalizedMessage.CHANNEL_COOLDOWN.toString()
 							.replace("{cooldown}", cooldownString));
 					mcp.setQuickChat(false);
-					bungee = false;
 					return;
 				}
 			}
@@ -375,7 +371,7 @@ public class ChatListener implements Listener {
 					}
 				}
 
-				if(chDistance > (double) 0 && !bungee && !p.getRangedSpy()) {
+				if(chDistance > (double) 0 && !p.getRangedSpy()) {
 					locreceip = p.getPlayer().getLocation();
 					if(locreceip.getWorld() == mcp.getPlayer().getWorld()) {
 						diff = locreceip.subtract(locsender);
@@ -428,7 +424,7 @@ public class ChatListener implements Listener {
 		int hash = message.hashCode();
 		
 		//Create VentureChatEvent
-		VentureChatEvent ventureChatEvent = new VentureChatEvent(mcp, mcp.getName(), mcp.getNickname(), MineverseChat.getVaultPermission().getPrimaryGroup(mcp.getPlayer()), eventChannel, recipients, recipientCount, format, chat, globalJSON, hash, bungee);
+		VentureChatEvent ventureChatEvent = new VentureChatEvent(mcp, mcp.getName(), mcp.getNickname(), MineverseChat.getVaultPermission().getPrimaryGroup(mcp.getPlayer()), eventChannel, recipients, recipientCount, format, chat, globalJSON, hash);
 		//Fire event and wait for other plugin listeners to act on it
 		Bukkit.getServer().getPluginManager().callEvent(ventureChatEvent);
 		//Call method to send the processed chat
@@ -448,57 +444,25 @@ public class ChatListener implements Listener {
 		String consoleChat = event.getConsoleChat();
 		String globalJSON = event.getGlobalJSON();
 		int hash = event.getHash();
-		boolean bungee = event.isBungee();
 
 		if (essentialsDiscordHook && channel.isDefaultchannel()) {
 			Bukkit.getServicesManager().load(DiscordService.class).sendChatMessage(mcp.getPlayer(), chat);
 		}
 		
-		if(!bungee) {
-			if(Database.isEnabled()) {
-				Database.writeVentureChat(mcp.getUUID().toString(), mcp.getName(), "Local", channel.getName(), chat.replace("'", "''"), "Chat");
-			}
-			
-			if(recipientCount == 1) {
-				if(!plugin.getConfig().getString("emptychannelalert", "&6No one is listening to you.").equals("")) {
-					mcp.getPlayer().sendMessage(Format.FormatStringAll(plugin.getConfig().getString("emptychannelalert", "&6No one is listening to you.")));	
-				}
-			}
-			for(Player p : recipients) {
-				String json = Format.formatModerationGUI(globalJSON, p, mcp.getName(), channel.getName(), hash);
-				PacketContainer packet = Format.createPacketPlayOutChat(json);
-				Format.sendPacketPlayOutChat(p, packet);
-			}
-			Bukkit.getConsoleSender().sendMessage(consoleChat);
-			return;
+		if(Database.isEnabled()) {
+			Database.writeVentureChat(mcp.getUUID().toString(), mcp.getName(), "Local", channel.getName(), chat.replace("'", "''"), "Chat");
 		}
-		else {
-			ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-			DataOutputStream out = new DataOutputStream(byteOutStream);
-			try {
-				out.writeUTF("Chat");
-				out.writeUTF(channel.getName());
-				out.writeUTF(mcp.getName());
-				out.writeUTF(mcp.getUUID().toString());
-				out.writeInt(hash);
-				out.writeUTF(format);
-				out.writeUTF(chat);
-				if(plugin.getConfig().getString("loglevel", "info").equals("debug")) {
-					System.out.println(out.size() + " size bytes without json");
-				}
-				out.writeUTF(globalJSON);
-				if(plugin.getConfig().getString("loglevel", "info").equals("debug")) {
-					System.out.println(out.size() + " bytes size with json");
-				}
-				out.writeUTF(MineverseChat.getVaultPermission().getPrimaryGroup(mcp.getPlayer()));
-				out.writeUTF(mcp.getNickname());
-				mcp.getPlayer().sendPluginMessage(plugin, MineverseChat.PLUGIN_MESSAGING_CHANNEL, byteOutStream.toByteArray());
-				out.close();
+		
+		if(recipientCount == 1) {
+			if(!plugin.getConfig().getString("emptychannelalert", "&6No one is listening to you.").equals("")) {
+				mcp.getPlayer().sendMessage(Format.FormatStringAll(plugin.getConfig().getString("emptychannelalert", "&6No one is listening to you.")));	
 			}
-			catch(Exception e) {
-				e.printStackTrace();
-			}
-			return;
 		}
+		for(Player p : recipients) {
+			String json = Format.formatModerationGUI(globalJSON, p, mcp.getName(), channel.getName(), hash);
+			PacketContainer packet = Format.createPacketPlayOutChat(json);
+			Format.sendPacketPlayOutChat(p, packet);
+		}
+		Bukkit.getConsoleSender().sendMessage(consoleChat);
 	}
 }

@@ -409,11 +409,9 @@ public class ChatListener implements Listener {
 		ChatChannel channel = event.getChannel();
 		Set<Player> recipients = event.getRecipients();
 		int recipientCount = event.getRecipientCount();
-		String format = event.getFormat();
 		String chat = event.getChat();
 		String consoleChat = event.getConsoleChat();
-		String globalJSON = event.getGlobalJSON();
-		int hash = event.getHash();
+		String globalJSON = event.getGlobalJSON();;
 
 		if (essentialsDiscordHook) {
 			Bukkit.getServicesManager().load(DiscordService.class).sendChatMessage(mcp.getPlayer(), chat);
@@ -429,8 +427,7 @@ public class ChatListener implements Listener {
 			}
 		}
 		for(Player p : recipients) {
-			String json = Format.formatModerationGUI(globalJSON, p, mcp.getName(), channel.getName(), hash);
-			PacketContainer packet = Format.createPacketPlayOutChat(json);
+			PacketContainer packet = Format.createPacketPlayOutChat(globalJSON);
 			Format.sendPacketPlayOutChat(p, packet);
 		}
 		Bukkit.getConsoleSender().sendMessage(consoleChat);

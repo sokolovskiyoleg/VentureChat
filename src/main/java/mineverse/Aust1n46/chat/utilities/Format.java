@@ -4,15 +4,14 @@ import static mineverse.Aust1n46.chat.MineverseChat.getInstance;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mineverse.Aust1n46.chat.MineverseChat;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
@@ -53,7 +52,7 @@ public class Format {
 	public static final long MILLISECONDS_PER_MINUTE = 60000;
 	public static final long MILLISECONDS_PER_SECOND = 1000;
 	
-	public static final String DEFAULT_MESSAGE_SOUND = "ENTITY_PLAYER_LEVELUP";
+	public static final String DEFAULT_MESSAGE_SOUND = "minecraft:entity.player.levelup";
 	public static final String DEFAULT_LEGACY_MESSAGE_SOUND = "LEVEL_UP";
 
 	/**
@@ -972,8 +971,13 @@ public class Format {
 	}
 	
 	private static Sound getSound(String soundName) {
-		for (Sound sound : Sound.values()) {
-			if (sound.toString().equalsIgnoreCase(soundName)) {
+		if (soundName == null || soundName.trim().isEmpty()) {
+			return getDefaultMessageSound();
+		}
+		NamespacedKey key = NamespacedKey.fromString(soundName.toLowerCase(Locale.ROOT));
+		if (key != null) {
+			Sound sound = Registry.SOUNDS.get(key);
+			if (sound != null) {
 				return sound;
 			}
 		}
@@ -982,13 +986,21 @@ public class Format {
 	}
 	
 	private static Sound getDefaultMessageSound() {
+		NamespacedKey key;
 		if(VersionHandler.is1_7() || VersionHandler.is1_8()) {
-			return Sound.valueOf(DEFAULT_LEGACY_MESSAGE_SOUND);
+			key = NamespacedKey.fromString(DEFAULT_LEGACY_MESSAGE_SOUND);
+			if (key != null) {
+                return Registry.SOUNDS.get(key);
+			}
 		}
 		else {
-			return Sound.valueOf(DEFAULT_MESSAGE_SOUND);
+			key = NamespacedKey.fromString(DEFAULT_MESSAGE_SOUND);
+			if (key != null) {
+                return Registry.SOUNDS.get(key);
+			}
 		}
-	}
+        return null;
+    }
 	
 	public static String stripColor(String message) {
 		return message.replaceAll("(\u00A7([a-z0-9]))", "");

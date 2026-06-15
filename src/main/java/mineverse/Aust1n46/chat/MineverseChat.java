@@ -20,7 +20,6 @@ import mineverse.Aust1n46.chat.channel.ChatChannelInfo;
 import mineverse.Aust1n46.chat.command.VentureCommandExecutor;
 import mineverse.Aust1n46.chat.database.Database;
 import mineverse.Aust1n46.chat.database.PlayerData;
-import mineverse.Aust1n46.chat.gui.GuiSlot;
 import mineverse.Aust1n46.chat.json.JsonFormat;
 import mineverse.Aust1n46.chat.listeners.ChatListener;
 import mineverse.Aust1n46.chat.listeners.CommandListener;
@@ -183,7 +182,6 @@ public class MineverseChat extends JavaPlugin {
 		Localization.initialize();
 		Alias.initialize();
 		JsonFormat.initialize();
-		GuiSlot.initialize();
 		ChatChannel.initialize();
 	}
 	

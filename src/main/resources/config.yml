@@ -90,7 +90,7 @@ offline_server_acknowledgement: false
 
 # Sound for message notification
 # Enter 'None' to disable the sound
-message_sound: ENTITY_PLAYER_LEVELUP
+message_sound: minecraft:entity.player.levelup
 
 # This will allow vanished players to be exempt from being sent private messages, and will act as if they aren't online
 vanishsupport: true
@@ -164,24 +164,6 @@ jsonformatting:
         - '&fChannel: {venturechat_channel_color}{venturechat_channel_name}'
         click_action: 'run_command'
         click_text: '/chlist'
-    
-# The icon is the block shown in the GUI
-# The text is the display name of the block icon
-# Include a slash (/) before the command   
-# Permissions are the name of the button and automatically include "venturechat." 
-# Example: mute equals venturechat.mute
-venturegui:
-  removemessage:
-    icon: 'DIAMOND_AXE'
-    durability: 0
-    text: '&cRemove Message'
-    permission: 'removemessage'
-    command: '/removemessage {hash} {channel}'
-    slot: 7
-
-guiicon: '&c [✓]'
-guitext: '&cOpen Moderation GUI'
-guirows: 1
 
 # All clickable URL's will be underlined if set to true
 underlineurls: true
@@ -240,10 +222,8 @@ enable_towny_channel: false
 # WARNING: May not work for all versions of Factions!
 enable_factions_channel: false
 
-# color = [channel] color
-# chatcolor = text color
+
 # cooldown is in seconds
-# bungeecord overrides distance
 # channel permissions are configurable
 # channels can be changed, and new channels can be created
 # Permissions automatically include "venturechat." 
@@ -259,121 +239,24 @@ enable_factions_channel: false
 # You must have prefixes and suffixes set in a Vault compatible permissions plugin to avoid errors
 # Use "" as the prefix or suffix to have none
 
-# Set chatcolor to 'None' to have a group based chat color! Don't forget to put a suffix or other placeholder at the end of the format!
-
 # Important!!!
 # Important!!!
 # If you delete a channel, restart the server! Do not use /chatreload!!!
 channels: 
   Global:
-    color: dark_green
-    chatcolor: dark_green
     filter: true
-    autojoin: true
-    default: false
     distance: 0
     cooldown: 0
     quickSymbol: '!'
-    alias: g
     permissions: None
     speak_permissions: None
-    channel_prefix: '&f[&2Global&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&2:'
-  Network:
-    color: gold
-    chatcolor: gold
-    filter: true
-    autojoin: true
-    default: false
-    distance: 0
-    cooldown: 3
-    quickSymbol: None
-    alias: be
-    permissions: None
-    speak_permissions: None
-    channel_prefix: '&f[&6Network&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&6:'
-  Announcement:
-    color: red
-    chatcolor: red
-    filter: false
-    autojoin: true
-    default: false
-    distance: 0
-    cooldown: 0
-    quickSymbol: None
-    alias: announce
-    permissions: None
-    speak_permissions: announcement
-    channel_prefix: '&f[&aServer Announcement&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&c:'
-  Staff:
-    color: green
-    chatcolor: green
-    filter: false
-    autojoin: true
-    default: false
-    distance: 0
-    cooldown: 0
-    quickSymbol: None
-    alias: st
-    permissions: staffchannel
-    speak_permissions: None
-    channel_prefix: '&f[&aStaff&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&a:'
-  Donator:
-    color: light_purple
-    chatcolor: light_purple
-    filter: true
-    autojoin: true
-    default: false
-    distance: 0
-    cooldown: 0
-    quickSymbol: None
-    alias: d
-    permissions: donatorchannel
-    speak_permissions: None
-    channel_prefix: '&f[&dDonator&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&d:'
-  Help:
-    color: aqua
-    chatcolor: aqua
-    filter: true
-    autojoin: true
-    default: false
-    distance: 0
-    cooldown: 0
-    quickSymbol: None
-    alias: h
-    permissions: None
-    speak_permissions: None
-    channel_prefix: '&f[&bHelp&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&b:'
-  Trade:
-    color: dark_aqua
-    chatcolor: dark_aqua
-    filter: true
-    autojoin: true
-    default: false
-    distance: 0
-    cooldown: 0
-    quickSymbol: None
-    alias: t
-    permissions: None
-    speak_permissions: None
-    channel_prefix: '&f[&3Trade&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&3:'
+    format: '&f[&2Global&f] {vault_prefix}{player_displayname}&2:'
+
   Local:
-    color: yellow
-    chatcolor: yellow
     filter: true
-    autojoin: true
-    default: true
     distance: 150
     cooldown: 0
     quickSymbol: None
-    alias: l
     permissions: None
     speak_permissions: None
-    channel_prefix: '&f[&eLocal&f]'
-    format: '{venturechat_channel_prefix} {vault_prefix}{player_displayname}&e:'
+    format: '&f[&eLocal&f] {vault_prefix}{player_displayname}&e:'

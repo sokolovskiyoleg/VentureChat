@@ -149,6 +149,6 @@ public class Message extends Command {
 			Collections.sort(completions);
 			return completions;
 		}
-		return super.tabComplete(sender, label, args);
+		return Collections.emptyList();
 	}
 }

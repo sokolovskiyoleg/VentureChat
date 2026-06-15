@@ -185,27 +185,11 @@ public class PlayerData {
             }
 
             playerDataFileYamlConfiguration.set("name", mcp.getName());
-            playerDataFileYamlConfiguration.set("current", mcp.getCurrentChannel().getName());
             String ignores = "";
             for (UUID s : mcp.getIgnores()) {
                 ignores += s.toString() + ",";
             }
             playerDataFileYamlConfiguration.set("ignores", ignores);
-            String listening = "";
-            for (String channel : mcp.getListening()) {
-                ChatChannel c = ChatChannel.getChannel(channel);
-                listening += c.getName() + ",";
-            }
-            String blockedCommands = "";
-            for (String s : mcp.getBlockedCommands()) {
-                blockedCommands += s + ",";
-            }
-            if (listening.length() > 0) {
-                listening = listening.substring(0, listening.length() - 1);
-            }
-            playerDataFileYamlConfiguration.set("listen", listening);
-
-            playerDataFileYamlConfiguration.set("blockedcommands", blockedCommands);
             playerDataFileYamlConfiguration.set("host", mcp.isHost());
             playerDataFileYamlConfiguration.set("party", mcp.hasParty() ? mcp.getParty().toString() : "");
             playerDataFileYamlConfiguration.set("filter", mcp.hasFilter());

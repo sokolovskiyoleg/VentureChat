@@ -15,9 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import mineverse.Aust1n46.chat.MineverseChat;
-import mineverse.Aust1n46.chat.channel.ChatChannel;
 import mineverse.Aust1n46.chat.command.chat.Broadcast;
-import mineverse.Aust1n46.chat.command.chat.Channel;
 import mineverse.Aust1n46.chat.command.chat.Chatreload;
 import mineverse.Aust1n46.chat.command.chat.Clearchat;
 import mineverse.Aust1n46.chat.command.chat.Commandspy;
@@ -82,7 +80,6 @@ public class VentureCommandExecutor {
 			}
 		}
 		commands.put("broadcast", new Broadcast());
-		commands.put("channel", new Channel());
 		commands.put("chatreload", new Chatreload());
 		commands.put("clearchat", new Clearchat());
 		commands.put("commandspy", new Commandspy());
@@ -101,11 +98,6 @@ public class VentureCommandExecutor {
 		commands.put("reply", new Reply());
 		commands.put("message", new Message());
 		commands.put("ignore", new Ignore());
-		final ChannelAlias channelAlias = new ChannelAlias();
-		for (final ChatChannel chatChannel : ChatChannel.getChatChannels()) {
-			final String alias = chatChannel.getAlias();
-			commands.put(alias, channelAlias);
-		}
 		final ConfigurationSection commandsSection = commandsFileConfiguration.getConfigurationSection("commands");
 		for (final String commandName : commandsSection.getKeys(false)) {
 			final ConfigurationSection commandSection = commandsSection.getConfigurationSection(commandName);

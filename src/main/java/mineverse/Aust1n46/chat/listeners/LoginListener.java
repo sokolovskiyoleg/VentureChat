@@ -54,7 +54,6 @@ public class LoginListener implements Listener {
 			MineverseChatAPI.addNameToMap(mcp);
 		}
 		UUIDFetcher.checkOfflineUUIDWarning(mcp.getUUID());
-		//check for name change
 		if(!mcp.getName().equals(name)) {
 			handleNameChange(mcp, event.getPlayer());
 		}
@@ -62,15 +61,5 @@ public class LoginListener implements Listener {
 		mcp.setHasPlayed(false);
 		MineverseChatAPI.addMineverseChatOnlinePlayerToMap(mcp);
 		mcp.setJsonFormat();
-		for(ChatChannel ch : ChatChannel.getAutojoinList()) {
-			if(ch.hasPermission()) {
-				if(mcp.getPlayer().hasPermission(ch.getPermission())) {
-					mcp.addListening(ch.getName());
-				}
-			}
-			else {
-				mcp.addListening(ch.getName());
-			}
-		}
 	}
 }

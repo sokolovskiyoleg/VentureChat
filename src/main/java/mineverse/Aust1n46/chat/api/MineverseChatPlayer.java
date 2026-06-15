@@ -23,12 +23,9 @@ import mineverse.Aust1n46.chat.json.JsonFormat;
 public class MineverseChatPlayer {
 	private UUID uuid;
 	private String name;
-	private ChatChannel currentChannel;
 	private Set<UUID> ignores;
-	private Set<String> listening;
-	private Set<String> blockedCommands;
-	private boolean host;
 	private UUID party;
+	private boolean host;
 	private boolean filter;
 	private boolean notifications;
 	private boolean online;
@@ -37,8 +34,6 @@ public class MineverseChatPlayer {
 	private UUID conversation;
 	private boolean spy;
 	private boolean commandSpy;
-	private boolean quickChat;
-	private ChatChannel quickChannel;
 	private UUID replyPlayer;
 	private HashMap<ChatChannel, Long> cooldowns;
 	private boolean partyChat;
@@ -47,7 +42,6 @@ public class MineverseChatPlayer {
 	private List<ChatMessage> messages;
 	private String jsonFormat;
 	private boolean editing;
-	private int editHash;
 	private boolean rangedSpy;
 	private boolean messageToggle;
 	
@@ -59,11 +53,7 @@ public class MineverseChatPlayer {
 	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
 		this.uuid = uuid;
 		this.name = name;
-		this.currentChannel = currentChannel;
 		this.ignores = ignores;
-		this.listening = listening;
-		this.blockedCommands = blockedCommands;
-		this.host = host;
 		this.party = party;
 		this.filter = filter;
 		this.notifications = notifications;
@@ -74,8 +64,6 @@ public class MineverseChatPlayer {
 		this.spy = spy;
 		this.rangedSpy = rangedSpy;
 		this.commandSpy = commandSpy;
-		this.quickChat = false;
-		this.quickChannel = null;
 		this.replyPlayer = null;
 		this.partyChat = false;
 		this.modified = false;
@@ -89,11 +77,7 @@ public class MineverseChatPlayer {
 	public MineverseChatPlayer(UUID uuid, String name) {
 		this.uuid = uuid;
 		this.name = name;
-		this.currentChannel = ChatChannel.getDefaultChannel();
 		this.ignores = new HashSet<UUID>();
-		this.listening = new HashSet<String>();
-		listening.add(currentChannel.getName());
-		this.blockedCommands = new HashSet<String>();
 		this.host = false;
 		this.party = null;
 		this.filter = true;
@@ -105,8 +89,6 @@ public class MineverseChatPlayer {
 		this.spy = false;
 		this.rangedSpy = false;
 		this.commandSpy = false;
-		this.quickChat = false;
-		this.quickChannel = null;
 		this.replyPlayer = null;
 		this.partyChat = false;
 		this.modified = false;
@@ -152,14 +134,6 @@ public class MineverseChatPlayer {
 		this.rangedSpy = rangedSpy;
 	}
 	
-	public int getEditHash() {
-		return this.editHash;
-	}
-	
-	public void setEditHash(int editHash) {
-		this.editHash = editHash;
-	}
-	
 	public boolean isEditing() {
 		return this.editing;
 	}
@@ -180,18 +154,6 @@ public class MineverseChatPlayer {
 		this.name = name;
 	}
 
-	public ChatChannel getCurrentChannel() {
-		return this.currentChannel;
-	}
-
-	public boolean setCurrentChannel(ChatChannel channel) {
-		if(channel != null) {
-			this.currentChannel = channel;
-			return true;
-		}
-		return false;
-	}
-
 	public Set<UUID> getIgnores() {
 		return this.ignores;
 	}
@@ -202,64 +164,6 @@ public class MineverseChatPlayer {
 
 	public void removeIgnore(UUID ignore) {
 		this.ignores.remove(ignore);
-	}
-
-	public Set<String> getListening() {
-		return this.listening;
-	}
-	
-	public boolean isListening(String channel) {
-		if(this.isOnline()) {
-			if(ChatChannel.isChannel(channel)) {
-				ChatChannel chatChannel = ChatChannel.getChannel(channel);
-				if(chatChannel.hasPermission()) {
-					if(!this.getPlayer().hasPermission(chatChannel.getPermission())) {
-						if(this.getCurrentChannel().equals(chatChannel)) {
-							this.setCurrentChannel(ChatChannel.getDefaultChannel());
-						}
-						this.removeListening(channel);
-						return false;
-					}
-				}
-			}
-		}
-		return this.listening.contains(channel);
-	}
-
-	public boolean addListening(String channel) {
-		if(channel != null) {
-			this.listening.add(channel);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean removeListening(String channel) {
-		if(channel != null) {
-			this.listening.remove(channel);
-			return true;
-		}
-		return false;
-	}
-
-	public void clearListening() {
-		this.listening.clear();
-	}
-
-	public Set<String> getBlockedCommands() {
-		return this.blockedCommands;
-	}
-
-	public void addBlockedCommand(String command) {
-		this.blockedCommands.add(command);
-	}
-
-	public void removeBlockedCommand(String command) {
-		this.blockedCommands.remove(command);
-	}
-
-	public boolean isBlockedCommand(String command) {
-		return this.blockedCommands.contains(command);
 	}
 
 	public boolean isHost() {
@@ -362,35 +266,6 @@ public class MineverseChatPlayer {
 
 	public void setCommandSpy(boolean commandSpy) {
 		this.commandSpy = commandSpy;
-	}
-
-	public boolean isQuickChat() {
-		return this.quickChat;
-	}
-
-	public void setQuickChat(boolean quickChat) {
-		this.quickChat = quickChat;
-	}
-
-	public ChatChannel getQuickChannel() {
-		return this.quickChannel;
-	}
-
-	public boolean setQuickChannel(ChatChannel channel) {
-		if(channel != null) {
-			this.quickChannel = channel;
-			return true;
-		}
-		return false;
-	}
-
-	@Deprecated
-	/**
-	 * Not needed and never resets to it's original null value after being set once.
-	 * @return
-	 */
-	public boolean hasQuickChannel() {
-		return this.quickChannel != null;
 	}
 
 	public UUID getReplyPlayer() {

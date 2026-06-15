@@ -59,11 +59,6 @@ public class CommandListener implements Listener {
 		}
 
 		String[] blocked = event.getMessage().split(" ");
-		if (mcp.getBlockedCommands().contains(blocked[0])) {
-			mcp.getPlayer().sendMessage(LocalizedMessage.BLOCKED_COMMAND.toString().replace("{command}", event.getMessage()));
-			event.setCancelled(true);
-			return;
-		}
 
 		String message = event.getMessage();
 

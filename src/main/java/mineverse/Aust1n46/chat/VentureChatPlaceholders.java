@@ -21,27 +21,6 @@ public class VentureChatPlaceholders extends PlaceholderExpansion {
         if (identifier.equalsIgnoreCase("nickname")) {
             return mcp.hasNickname() ? mcp.getNickname() : mcp.getName();
         }
-        if (identifier.equalsIgnoreCase("something_else_you_think_of")) {
-            return "value for that identifier *";
-        }
-        if (identifier.startsWith("channel_")) {
-            ChatChannel currentChannel = mcp.isQuickChat() ? mcp.getQuickChannel() : mcp.getCurrentChannel();
-            if (currentChannel == null) {
-                return "";
-            }
-            switch (identifier) {
-                case "channel_name":
-                    return currentChannel.getName();
-                case "channel_alias":
-                    return currentChannel.getAlias();
-                case "channel_cooldown":
-                    return currentChannel.getCooldown() + "";
-                case "channel_distance":
-                    return currentChannel.getDistance() + "";
-                case "channel_prefix":
-                	return currentChannel.getPrefix();
-            }
-        }
         return null;
     }
 

@@ -5,14 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -30,7 +27,6 @@ import mineverse.Aust1n46.chat.api.events.VentureChatEvent;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
 import mineverse.Aust1n46.chat.channel.ChatChannelInfo;
 import mineverse.Aust1n46.chat.command.VentureCommandExecutor;
-import mineverse.Aust1n46.chat.command.chat.Channel;
 import mineverse.Aust1n46.chat.database.Database;
 import mineverse.Aust1n46.chat.database.PlayerData;
 import mineverse.Aust1n46.chat.gui.GuiSlot;
@@ -40,7 +36,6 @@ import mineverse.Aust1n46.chat.listeners.CommandListener;
 import mineverse.Aust1n46.chat.listeners.LoginListener;
 import mineverse.Aust1n46.chat.listeners.PacketListenerLegacyChat;
 import mineverse.Aust1n46.chat.localization.Localization;
-import mineverse.Aust1n46.chat.localization.LocalizedMessage;
 import mineverse.Aust1n46.chat.utilities.Format;
 import mineverse.Aust1n46.chat.versions.VersionHandler;
 import net.milkbowl.vault.chat.Chat;
@@ -168,7 +163,6 @@ public class MineverseChat extends JavaPlugin implements PluginMessageListener {
 	
 	private void registerListeners() {
 		PluginManager pluginManager = getServer().getPluginManager();
-		pluginManager.registerEvents(new Channel(), this);
 		pluginManager.registerEvents(new ChatListener(), this);
 		pluginManager.registerEvents(new CommandListener(), this);
 		pluginManager.registerEvents(new LoginListener(), this);
@@ -269,11 +263,6 @@ public class MineverseChat extends JavaPlugin implements PluginMessageListener {
 				ChatChannel chatChannelObject = ChatChannel.getChannel(chatchannel);
 				
 				Set<Player> recipients = new HashSet<Player>();
-				for(MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
-					if(p.isListening(chatChannelObject.getName())) {
-						recipients.add(p.getPlayer());
-					}
-				}
 				
 				Bukkit.getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
 					@Override
@@ -292,20 +281,17 @@ public class MineverseChat extends JavaPlugin implements PluginMessageListener {
 				}
 				
 				for(MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
-					if(p.isListening(chatChannelObject.getName())) {
-						
-						String json = Format.formatModerationGUI(globalJSON, p.getPlayer(), senderName, chatchannel, hash);
-						PacketContainer packet = Format.createPacketPlayOutChat(json);
-						
-						if(getConfig().getBoolean("ignorechat", false)) {
-							if(!p.getIgnores().contains(senderUUID)) {
-								// System.out.println("Chat sent");
-								Format.sendPacketPlayOutChat(p.getPlayer(), packet);
-							}
-							continue;
+					String json = Format.formatModerationGUI(globalJSON, p.getPlayer(), senderName, chatchannel, hash);
+					PacketContainer packet = Format.createPacketPlayOutChat(json);
+
+					if(getConfig().getBoolean("ignorechat", false)) {
+						if(!p.getIgnores().contains(senderUUID)) {
+							// System.out.println("Chat sent");
+							Format.sendPacketPlayOutChat(p.getPlayer(), packet);
 						}
-						Format.sendPacketPlayOutChat(p.getPlayer(), packet);	
+						continue;
 					}
+					Format.sendPacketPlayOutChat(p.getPlayer(), packet);
 				}
 			}
 			if(subchannel.equals("DiscordSRV")) {
@@ -322,11 +308,9 @@ public class MineverseChat extends JavaPlugin implements PluginMessageListener {
 				int hash = (message.replaceAll("([�]([a-z0-9]))", "")).hashCode();
 				
 				for(MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
-					if(p.isListening(chatChannelObj.getName())) {
-						String finalJSON = Format.formatModerationGUI(json, p.getPlayer(), "Discord", chatChannelObj.getName(), hash);
-						PacketContainer packet = Format.createPacketPlayOutChat(finalJSON);
-						Format.sendPacketPlayOutChat(p.getPlayer(), packet);
-					}
+					String finalJSON = Format.formatModerationGUI(json, p.getPlayer(), "Discord", chatChannelObj.getName(), hash);
+					PacketContainer packet = Format.createPacketPlayOutChat(finalJSON);
+					Format.sendPacketPlayOutChat(p.getPlayer(), packet);
 				}	
 			}
 			if(subchannel.equals("PlayerNames")) {
@@ -335,54 +319,6 @@ public class MineverseChat extends JavaPlugin implements PluginMessageListener {
 				for(int a = 0; a < playerCount; a ++) {
 					MineverseChatAPI.addNetworkPlayerName(msgin.readUTF());
 				}
-			}
-			if(subchannel.equals("Chwho")) {
-				String identifier = msgin.readUTF();
-				if(identifier.equals("Get")) {
-					String server = msgin.readUTF();
-					String sender = msgin.readUTF();
-					String chatchannel = msgin.readUTF();
-					List<String> listening = new ArrayList<String>();
-					if(ChatChannel.isChannel(chatchannel)) {
-						for(MineverseChatPlayer mcp : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
-							if(mcp.isListening(chatchannel)) {
-								String entry = "&f" + mcp.getName();
-								listening.add(entry);
-							}
-						}
-					}
-					out.writeUTF("Chwho");
-					out.writeUTF("Receive");
-					out.writeUTF(server);
-					out.writeUTF(sender);
-					out.writeUTF(chatchannel);
-					out.writeInt(listening.size());
-					for(String s : listening) {
-						out.writeUTF(s);
-					}
-					sendPluginMessage(stream);
-				}
-				if(identifier.equals("Receive")) {
-					String sender = msgin.readUTF();
-					String stringchannel = msgin.readUTF();
-					MineverseChatPlayer mcp = MineverseChatAPI.getOnlineMineverseChatPlayer(UUID.fromString(sender));
-					ChatChannel chatchannel = ChatChannel.getChannel(stringchannel);
-					String playerList = "";
-					int size = msgin.readInt();
-					for(int a = 0; a < size; a++) {
-						playerList += msgin.readUTF() + ChatColor.WHITE + ", ";
-					}
-					if(playerList.length() > 2) {
-						playerList = playerList.substring(0, playerList.length() - 2);
-					}
-					mcp.getPlayer().sendMessage(LocalizedMessage.CHANNEL_PLAYER_LIST_HEADER.toString()
-							.replace("{channel_name}", chatchannel.getName()));
-					mcp.getPlayer().sendMessage(Format.FormatStringAll(playerList));
-				}
-			}
-			if(subchannel.equals("RemoveMessage")) {
-				String hash = msgin.readUTF();
-				getServer().dispatchCommand(this.getServer().getConsoleSender(), "removemessage " + hash);
 			}
 		}
 		catch(Exception e) {

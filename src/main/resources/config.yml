@@ -60,12 +60,7 @@ antispam:
   
   # Amount of time in seconds for it to be spam
   spamtime: 10
-  
-  # Amount of time for the mute to last
-  # Acceptable units are: d,h,m,s
-  # Units can be combined, for example: 1d8h30m15s
-  # Use 0 for untimed mute
-  mutetime: 10m
+
  
 # Logging chat and commands to a mysql database 
 mysql:
@@ -92,12 +87,6 @@ saveinterval: 30
 # https://www.spigotmc.org/wiki/bungeecord-ip-forwarding/
 # No player data will be saved in offline mode unless you set this acknowledgement to 'true'
 offline_server_acknowledgement: false
-
-# The time in seconds between each check to remove timed mutes
-unmuteinterval: 60
-
-# Enables or disabled BungeeCord messaging
-bungeecordmessaging: false
 
 # Sound for message notification
 # Enter 'None' to disable the sound
@@ -293,13 +282,11 @@ channels:
   Global:
     color: dark_green
     chatcolor: dark_green
-    mutable: true
     filter: true
     autojoin: true
-    default: true
+    default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
     quickSymbol: '!'
     alias: g
     permissions: None
@@ -309,13 +296,12 @@ channels:
   Network:
     color: gold
     chatcolor: gold
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 3
-    bungeecord: true
+    quickSymbol: None
     alias: be
     permissions: None
     speak_permissions: None
@@ -324,13 +310,12 @@ channels:
   Announcement:
     color: red
     chatcolor: red
-    mutable: false
     filter: false
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: true
+    quickSymbol: None
     alias: announce
     permissions: None
     speak_permissions: announcement
@@ -339,13 +324,12 @@ channels:
   Staff:
     color: green
     chatcolor: green
-    mutable: false
     filter: false
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
+    quickSymbol: None
     alias: st
     permissions: staffchannel
     speak_permissions: None
@@ -354,13 +338,12 @@ channels:
   Donator:
     color: light_purple
     chatcolor: light_purple
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
+    quickSymbol: None
     alias: d
     permissions: donatorchannel
     speak_permissions: None
@@ -369,13 +352,12 @@ channels:
   Help:
     color: aqua
     chatcolor: aqua
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
+    quickSymbol: None
     alias: h
     permissions: None
     speak_permissions: None
@@ -384,13 +366,12 @@ channels:
   Trade:
     color: dark_aqua
     chatcolor: dark_aqua
-    mutable: true
     filter: true
     autojoin: true
     default: false
     distance: 0
     cooldown: 0
-    bungeecord: false
+    quickSymbol: None
     alias: t
     permissions: None
     speak_permissions: None
@@ -399,13 +380,12 @@ channels:
   Local:
     color: yellow
     chatcolor: yellow
-    mutable: true
     filter: true
     autojoin: true
-    default: false
-    distance: 230
+    default: true
+    distance: 150
     cooldown: 0
-    bungeecord: false
+    quickSymbol: None
     alias: l
     permissions: None
     speak_permissions: None

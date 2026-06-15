@@ -15,18 +15,6 @@ commands:
     spy:
         aliases: [vspy]
         enabled: true
-    mute:
-        aliases: [mp,vmute]
-        enabled: true
-    unmute:
-        aliases: [ump,vunmute]
-        enabled: true
-    muteall:
-        aliases: [mpa,vmuteall]
-        enabled: true
-    unmuteall:
-        aliases: [umpa,vunmuteall]
-        enabled: true
     channel:
         aliases: [ch,vchannel,join]
         enabled: true
@@ -44,12 +32,6 @@ commands:
         enabled: true
     setchannel:
         aliases: [sc,vsetchannel]
-        enabled: true
-    kickchannel:
-        aliases: [kc,vkickchannel]
-        enabled: true
-    kickchannelall:
-        aliases: [kca,vkickchannelall]
         enabled: true
     setchannelall:
         aliases: [sca,vsetchannelall]

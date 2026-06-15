@@ -289,15 +289,16 @@ enable_factions_channel: false
 # Important!!!
 # Important!!!
 # If you delete a channel, restart the server! Do not use /chatreload!!!
-channels: 
+channels:
   Global:
     color: dark_green
     chatcolor: dark_green
     filter: true
     autojoin: true
-    default: true
+    default: false
     distance: 0
     cooldown: 0
+    quickSymbol: '!'
     alias: g
     permissions: None
     speak_permissions: None
@@ -311,6 +312,7 @@ channels:
     default: false
     distance: 0
     cooldown: 3
+    quickSymbol: None
     alias: be
     permissions: None
     speak_permissions: None
@@ -324,6 +326,7 @@ channels:
     default: false
     distance: 0
     cooldown: 0
+    quickSymbol: None
     alias: announce
     permissions: None
     speak_permissions: announcement
@@ -337,6 +340,7 @@ channels:
     default: false
     distance: 0
     cooldown: 0
+    quickSymbol: None
     alias: st
     permissions: staffchannel
     speak_permissions: None
@@ -350,6 +354,7 @@ channels:
     default: false
     distance: 0
     cooldown: 0
+    quickSymbol: None
     alias: d
     permissions: donatorchannel
     speak_permissions: None
@@ -363,6 +368,7 @@ channels:
     default: false
     distance: 0
     cooldown: 0
+    quickSymbol: None
     alias: h
     permissions: None
     speak_permissions: None
@@ -376,6 +382,7 @@ channels:
     default: false
     distance: 0
     cooldown: 0
+    quickSymbol: None
     alias: t
     permissions: None
     speak_permissions: None
@@ -386,9 +393,10 @@ channels:
     chatcolor: yellow
     filter: true
     autojoin: true
-    default: false
-    distance: 230
+    default: true
+    distance: 150
     cooldown: 0
+    quickSymbol: None
     alias: l
     permissions: None
     speak_permissions: None

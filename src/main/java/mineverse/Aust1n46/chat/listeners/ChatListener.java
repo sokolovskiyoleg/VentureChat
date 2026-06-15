@@ -47,7 +47,6 @@ public class ChatListener implements Listener {
 	}
 	
 	public void handleTrueAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
-		boolean bungee = false;
 		String chat = event.getMessage();
 		String format;
 		Set<Player> recipients = event.getRecipients();
@@ -348,7 +347,7 @@ public class ChatListener implements Listener {
 					}
 				}
 
-				if(chDistance > (double) 0 && !bungee && !p.getRangedSpy()) {
+				if(chDistance > (double) 0 && !p.getRangedSpy()) {
 					locreceip = p.getPlayer().getLocation();
 					if(locreceip.getWorld() == mcp.getPlayer().getWorld()) {
 						diff = locreceip.subtract(locsender);
@@ -398,7 +397,7 @@ public class ChatListener implements Listener {
 		int hash = message.hashCode();
 		
 		//Create VentureChatEvent
-		VentureChatEvent ventureChatEvent = new VentureChatEvent(mcp, mcp.getName(), mcp.getNickname(), MineverseChat.getVaultPermission().getPrimaryGroup(mcp.getPlayer()), eventChannel, recipients, recipientCount, format, chat, globalJSON, hash, bungee);
+		VentureChatEvent ventureChatEvent = new VentureChatEvent(mcp, mcp.getName(), mcp.getNickname(), MineverseChat.getVaultPermission().getPrimaryGroup(mcp.getPlayer()), eventChannel, recipients, recipientCount, format, chat, globalJSON, hash);
 		//Fire event and wait for other plugin listeners to act on it
 		Bukkit.getServer().getPluginManager().callEvent(ventureChatEvent);
 		//Call method to send the processed chat

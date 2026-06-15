@@ -29,9 +29,8 @@ public class VentureChatEvent extends Event {
 	private final String chat;
 	private final String globalJSON;
 	private final int hash;
-	private final boolean bungee;
 	
-	public VentureChatEvent(MineverseChatPlayer mcp, String username, String nickname, String playerPrimaryGroup, ChatChannel channel, Set<Player> recipients, int recipientCount, String format, String chat, String globalJSON, int hash, boolean bungee) {
+	public VentureChatEvent(MineverseChatPlayer mcp, String username, String nickname, String playerPrimaryGroup, ChatChannel channel, Set<Player> recipients, int recipientCount, String format, String chat, String globalJSON, int hash) {
 		super(MineverseChat.ASYNC);
 		this.mcp = mcp;
 		this.username = username;
@@ -44,7 +43,6 @@ public class VentureChatEvent extends Event {
 		this.chat = chat;
 		this.globalJSON = globalJSON;
 		this.hash = hash;
-		this.bungee = bungee;
 	}
 	
 	public MineverseChatPlayer getMineverseChatPlayer() {
@@ -95,9 +93,10 @@ public class VentureChatEvent extends Event {
 	public int getHash() {
 		return this.hash;
 	}
-	
+
+	@Deprecated
 	public boolean isBungee() {
-		return this.bungee;
+		return false;
 	}
 	
 	@Override

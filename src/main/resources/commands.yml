@@ -30,9 +30,6 @@ commands:
     commandspy:
         aliases: [comspy,vcommandspy]
         enabled: true
-    venturechat:
-        aliases: [vc]
-        enabled: true
     me:
         aliases: [vme]
         enabled: true

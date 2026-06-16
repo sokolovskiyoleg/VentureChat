@@ -15,9 +15,6 @@ commands:
     spy:
         aliases: [vspy]
         enabled: true
-    channel:
-        aliases: [ch,vchannel,join]
-        enabled: true
     force:
         aliases: [for,vforce]
         enabled: true

@@ -33,7 +33,6 @@ public enum LocalizedMessage {
     IGNORE_PLAYER_ON("IgnorePlayerOn"),
     IGNORE_YOURSELF("IgnoreYourself"),
     IGNORING_MESSAGE("IgnoringMessage"),
-    INVALID_HASH("InvalidHash"),
     MESSAGE_TOGGLE_OFF("MessageToggleOff"),
     MESSAGE_TOGGLE_ON("MessageToggleOn"),
     NO_PLAYER_TO_REPLY_TO("NoPlayerToReplyTo"),

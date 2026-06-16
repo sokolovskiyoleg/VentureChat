@@ -38,6 +38,7 @@ public enum LocalizedMessage {
     IGNORING_MESSAGE("IgnoringMessage"),
     MESSAGE_TOGGLE_OFF("MessageToggleOff"),
     MESSAGE_TOGGLE_ON("MessageToggleOn"),
+    MESSAGE_TOGGLED_PM("MessageToggledPM"),
     NO_PLAYER_TO_REPLY_TO("NoPlayerToReplyTo"),
     NOTIFICATIONS_OFF("NotificationsOff"),
     NOTIFICATIONS_ON("NotificationsOn"),

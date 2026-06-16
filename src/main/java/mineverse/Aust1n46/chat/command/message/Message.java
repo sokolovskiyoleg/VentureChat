@@ -45,6 +45,10 @@ public class Message extends Command {
 			mcp.getPlayer().sendMessage(LocalizedMessage.PLAYER_OFFLINE.toString().replace("{args}", args[0]));
 			return true;
 		}
+		if (!mcp.getMessageToggle()){
+			mcp.getPlayer().sendMessage(LocalizedMessage.MESSAGE_TOGGLED_PM.toString());
+			return true;
+		}
 		if (mcp.getIgnores().contains(player.getUUID())){
 			mcp.getPlayer().sendMessage(LocalizedMessage.IGNORE_MESSAGE_TO_IGNORED_PLAYER.toString());
 			return true;

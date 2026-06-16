@@ -18,7 +18,6 @@ import mineverse.Aust1n46.chat.command.chat.Broadcast;
 import mineverse.Aust1n46.chat.command.chat.Chatreload;
 import mineverse.Aust1n46.chat.command.chat.Clearchat;
 import mineverse.Aust1n46.chat.command.chat.Commandspy;
-import mineverse.Aust1n46.chat.command.chat.Edit;
 import mineverse.Aust1n46.chat.command.chat.Filter;
 import mineverse.Aust1n46.chat.command.chat.Force;
 import mineverse.Aust1n46.chat.command.chat.Forceall;
@@ -59,7 +58,6 @@ public class VentureCommandExecutor {
 		commands.put("chatreload", new Chatreload());
 		commands.put("clearchat", new Clearchat());
 		commands.put("commandspy", new Commandspy());
-		commands.put("edit", new Edit());
 		commands.put("filter", new Filter());
 		commands.put("force", new Force());
 		commands.put("forceall", new Forceall());

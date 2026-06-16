@@ -369,7 +369,6 @@ public class ChatListener implements Listener {
 				}
 				if(!mcp.getPlayer().canSee(p.getPlayer())) {
 					recipientCount--;
-					continue;
 				}
 			}
 		}

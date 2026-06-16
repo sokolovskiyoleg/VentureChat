@@ -28,6 +28,7 @@ import mineverse.Aust1n46.chat.json.JsonAttribute;
 import mineverse.Aust1n46.chat.json.JsonFormat;
 import mineverse.Aust1n46.chat.localization.LocalizedMessage;
 import mineverse.Aust1n46.chat.versions.VersionHandler;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Class containing chat formatting methods.
@@ -88,9 +89,6 @@ public class Format {
      *
      * @param s
      * @param format
-     * @param prefix
-     * @param nickname
-     * @param suffix
      * @param icp
      * @return {@link String}
      */
@@ -447,21 +445,6 @@ public class Format {
 	
 	private static String escapeJsonChars(String s) {
 		return s.replace("\\", "\\\\").replace("\"", "\\\"");
-	}
-
-	public static String formatModerationGUI(String json, Player player, String sender, String channelName, int hash) {
-		if (player.hasPermission("venturechat.gui")) {
-			json = json.substring(0, json.length() - 1);
-			json += "," + Format.convertToJsonColors(Format.FormatStringAll(getInstance().getConfig().getString("guiicon")),
-					",\"click_event\":{\"action\":\"run_command\",\"command\":\"/vchatgui " + sender + " " + channelName
-							+ " " + hash
-							+ "\"},\"hover_event\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":["
-							+ Format.convertToJsonColors(
-									Format.FormatStringAll(getInstance().getConfig().getString("guitext")))
-							+ "]}}")
-					+ "]";
-		}
-		return json;
 	}
 
 	public static PacketContainer createPacketPlayOutChat(String json) {

@@ -3,13 +3,12 @@ package mineverse.Aust1n46.chat.command;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Server;
 import org.bukkit.command.Command;
-import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -43,9 +42,6 @@ public class VentureCommandExecutor {
 	private static final Map<String, Command> commands = new HashMap<>();
 	private static final MineverseChat plugin = MineverseChat.getInstance();
 
-	private static Map<String, Command> knownCommands;
-
-	@SuppressWarnings("unchecked")
 	public static void initialize() {
 		final Server server = plugin.getServer();
 		final File commandsFile = new File(plugin.getDataFolder().getAbsolutePath(), "commands.yml");
@@ -59,24 +55,6 @@ public class VentureCommandExecutor {
 			commandsFile.renameTo(new File(plugin.getDataFolder().getAbsolutePath(), "commands_old_" + fileVersion + ".yml"));
 			plugin.saveResource("commands.yml", true);
 			commandsFileConfiguration = YamlConfiguration.loadConfiguration(commandsFile);
-		}
-		try {
-			knownCommands = server.getCommandMap().getKnownCommands(); // Paper :)
-		}
-		// Spigot :(
-		catch (final NoSuchMethodError error) {
-			try {
-				final Field commandMapField = server.getClass().getDeclaredField("commandMap");
-				commandMapField.setAccessible(true);
-				final SimpleCommandMap simpleCommandMap = (SimpleCommandMap) commandMapField.get(server);
-				final Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
-				knownCommandsField.setAccessible(true);
-				knownCommands = (Map<String, Command>) knownCommandsField.get(simpleCommandMap);
-			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-				server.getConsoleSender()
-						.sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - Unable to access CommandMap on Spigot. If this issue persists, try using Paper."));
-				e.printStackTrace();
-			}
 		}
 		commands.put("broadcast", new Broadcast());
 		commands.put("chatreload", new Chatreload());
@@ -105,29 +83,32 @@ public class VentureCommandExecutor {
 			} else {
 				final Command command = commands.get(commandName);
 				if (command != null) {
-					final List<String> aliases = commandSection.getStringList("aliases");
-					for (final String alias : aliases) {
-						commands.put(alias, command);
-					}
-					commands.put("venturechat:" + commandName, command);
+					command.setAliases(commandSection.getStringList("aliases"));
 				}
 			}
 		}
-		// Initial registration is required to ensure commands are recognized by the
-		// server after enabling every plugin
-		for (final Entry<String, Command> commandEntry : commands.entrySet()) {
-			registerCommand(commandEntry.getKey(), commandEntry.getValue());
-		}
-		// Forcibly re-register enabled VentureChat commands on a delay to ensure they
-		// have priority
-		server.getScheduler().runTaskLater(plugin, () -> {
-			for (final Entry<String, Command> commandEntry : commands.entrySet()) {
-				registerCommand(commandEntry.getKey(), commandEntry.getValue());
-			}
-		}, 10);
+		final CommandMap commandMap = getCommandMap(server);
+		registerAll(commandMap);
+		server.getScheduler().runTaskLater(plugin, () -> registerAll(commandMap), 10);
 	}
 
-	public static void registerCommand(final String commandLabel, final Command command) {
-		knownCommands.put(commandLabel, command);
+	private static void registerAll(final CommandMap commandMap) {
+		for (final Entry<String, Command> commandEntry : commands.entrySet()) {
+			commandMap.register("venturechat", commandEntry.getValue());
+		}
+	}
+
+	private static CommandMap getCommandMap(final Server server) {
+		try {
+			return server.getCommandMap(); // Paper
+		} catch (final NoSuchMethodError e) {
+			try {
+				final Field commandMapField = server.getClass().getDeclaredField("commandMap");
+				commandMapField.setAccessible(true);
+				return (CommandMap) commandMapField.get(server);
+			} catch (final ReflectiveOperationException ex) {
+				throw new RuntimeException("Unable to access CommandMap. Use Paper.", ex);
+			}
+		}
 	}
 }

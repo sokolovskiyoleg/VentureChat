@@ -76,13 +76,23 @@ public class Ignore extends Command {
 	@Override
 	public List<String> tabComplete(CommandSender sender, String label, String[] args) {
 		if (args.length == 1) {
+			String prefix = args[0];
 			List<String> completions = new ArrayList<>();
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				completions.add(player.getName());
+				if (sender instanceof Player && !((Player) sender).canSee(player)) {
+					continue;
+				}
+				if (startsWithIgnoreCase(player.getName(), prefix)) {
+					completions.add(player.getName());
+				}
 			}
 			Collections.sort(completions);
 			return completions;
 		}
-		return super.tabComplete(sender, label, args);
+		return Collections.emptyList();
+	}
+
+	private boolean startsWithIgnoreCase(String value, String prefix) {
+		return value.regionMatches(true, 0, prefix, 0, prefix.length());
 	}
 }

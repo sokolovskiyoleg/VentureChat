@@ -847,7 +847,7 @@ public class Format {
 		if (message == null || message.isBlank()) {
 			return;
 		}
-		String formattedMessage = FormatString(processPlaceHolders(sender, message));
+		String formattedMessage = FormatStringAll(message);
 		UUID senderUuid = sender instanceof Player player
 				? player.getUniqueId()
 				: null;
@@ -858,9 +858,10 @@ public class Format {
 			if (target == null || !target.isOnline()) {
 				continue;
 			}
-
-			if (senderUuid != null && mcp.getIgnores().contains(senderUuid)) {
-				continue;
+			if(MineverseChat.getInstance().getConfig().getBoolean("ignoreBroadCast", false)){
+				if (senderUuid != null && mcp.getIgnores().contains(senderUuid)) {
+					continue;
+				}
 			}
 
 			target.sendMessage(formattedMessage);

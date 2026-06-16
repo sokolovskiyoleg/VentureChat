@@ -105,6 +105,8 @@ formatcleaner: true
 
 # If true, /ignore will block chat from the ignored player as well as PM's
 ignorechat: false
+# If true /ignore will block broadcasts from the ignored player
+ignoreBroadCast: false
 
 # The message shown to players alerting them no one is in the channel to hear them
 emptychannelalert: "&6No one is listening to you."

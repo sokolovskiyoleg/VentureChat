@@ -26,10 +26,9 @@ public class Broadcast extends Command {
 		if (broadcastPermissions.equalsIgnoreCase("None") || sender.hasPermission(broadcastPermissions)) {
 			if (args.length > 0) {
 				String broadcastDisplayTag = bs.getString("displaytag", "[Broadcast]");
-
+				broadcastDisplayTag	 = Format.processPlaceHolders(sender, broadcastDisplayTag);
 				String bc = String.join(" ", args);
 				bc = Format.FormatStringAll(bc);
-
 				Format.broadcastToServer(sender, broadcastDisplayTag + " " + bc);
 				return true;
 			} else {

@@ -25,7 +25,6 @@ import mineverse.Aust1n46.chat.command.chat.Forceall;
 import mineverse.Aust1n46.chat.command.chat.Me;
 import mineverse.Aust1n46.chat.command.chat.Party;
 import mineverse.Aust1n46.chat.command.chat.RangedSpy;
-import mineverse.Aust1n46.chat.command.chat.Removemessage;
 import mineverse.Aust1n46.chat.command.message.Ignore;
 import mineverse.Aust1n46.chat.command.message.Message;
 import mineverse.Aust1n46.chat.command.message.MessageToggle;
@@ -68,7 +67,6 @@ public class VentureCommandExecutor {
 		commands.put("notifications", new Notifications());
 		commands.put("party", new Party());
 		commands.put("rangedspy", new RangedSpy());
-		commands.put("removemessage", new Removemessage());
 		commands.put("spy", new Spy());
 		commands.put("messagetoggle", new MessageToggle());
 		commands.put("reply", new Reply());

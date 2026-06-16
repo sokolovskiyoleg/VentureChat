@@ -210,6 +210,11 @@ alias:
     permissions: None
     components:
     - 'Message: &aThis is our website: www.site.net'
+  fork:
+    arguments: 0
+    permissions: None
+    components:
+    - 'Json: {"text":"Click to visit GitHub fork page","color":"green","clickEvent":{"action":"open_url","value":"https://github.com/CloudM1nd3/VentureChat"},"hoverEvent":{"action":"show_text","contents":"Visit GitHub"}}'
   
 # Enables the creation of special Towny channels: Town and Nation
 # To create these channels, simply name two channels below "Town" and "Nation"

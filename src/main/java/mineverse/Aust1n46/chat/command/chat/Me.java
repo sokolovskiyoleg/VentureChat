@@ -1,5 +1,6 @@
 package mineverse.Aust1n46.chat.command.chat;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,12 +32,11 @@ public class Me extends Command {
 					msg = Format.FormatStringColor(msg);
 				if (sender.hasPermission("venturechat.format"))
 					msg = Format.FormatString(msg);
-				if (sender instanceof Player) {
-					Player p = (Player) sender;
-					Format.broadcastToServer("* " + p.getDisplayName() + msg);
+				if (sender instanceof Player player) {
+					Format.broadcastToServer(sender, "* " + player.getDisplayName() + msg);
 					return true;
 				}
-				Format.broadcastToServer("* " + sender.getName() + msg);
+				Format.broadcastToServer(Bukkit.getConsoleSender(), "* " + sender.getName() + msg);
 				return true;
 			}
 			sender.sendMessage(LocalizedMessage.COMMAND_INVALID_ARGUMENTS.toString().replace("{command}", "/me").replace("{args}", "[message]"));

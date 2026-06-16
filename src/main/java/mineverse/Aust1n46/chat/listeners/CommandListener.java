@@ -1,9 +1,11 @@
 package mineverse.Aust1n46.chat.listeners;
 
+import java.io.Console;
 import java.io.FileNotFoundException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -120,7 +122,7 @@ public class CommandListener implements Listener {
 					event.setCancelled(true);
 				}
 				if (s.startsWith("Broadcast:")) {
-					Format.broadcastToServer(s.substring(11).replace("$", send));
+					Format.broadcastToServer(Bukkit.getConsoleSender(), s.substring(11).replace("$", send));
 					event.setCancelled(true);
 				}
 			}

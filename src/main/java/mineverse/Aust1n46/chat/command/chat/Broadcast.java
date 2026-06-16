@@ -21,25 +21,16 @@ public class Broadcast extends Command {
 	@Override
 	public boolean execute(CommandSender sender, String command, String[] args) {
 		ConfigurationSection bs = plugin.getConfig().getConfigurationSection("broadcast");
-		String broadcastColor = bs.getString("color", "white");
+		if(bs == null) return false;
 		String broadcastPermissions = bs.getString("permissions", "None");
-		String rawBroadcastDisplayTag = bs.getString("displaytag", "[Broadcast]");
 		if (broadcastPermissions.equalsIgnoreCase("None") || sender.hasPermission(broadcastPermissions)) {
 			if (args.length > 0) {
-				String bc = String.join("", args);
+				String broadcastDisplayTag = bs.getString("displaytag", "[Broadcast]");
+
+				String bc = String.join(" ", args);
 				bc = Format.FormatStringAll(bc);
 
-				// Хардколд обработки плейсхолдеров =)
-				String broadcastDisplayTag;
-				if(sender instanceof Player player){
-					broadcastDisplayTag = PlaceholderAPI.setBracketPlaceholders(player, rawBroadcastDisplayTag);
-				} else {
-					broadcastDisplayTag = rawBroadcastDisplayTag.replace("%player_name%", "Console").
-							replace("{player_name}", "Console");
-				}
-				broadcastDisplayTag = Format.FormatStringAll(broadcastDisplayTag);
-
-				Format.broadcastToServer(broadcastDisplayTag + ChatColor.valueOf(broadcastColor.toUpperCase()) + " " + bc);
+				Format.broadcastToServer(sender, broadcastDisplayTag + " " + bc);
 				return true;
 			} else {
 				sender.sendMessage(LocalizedMessage.COMMAND_INVALID_ARGUMENTS.toString().replace("{command}", "/broadcast").replace("{args}", "[msg]"));

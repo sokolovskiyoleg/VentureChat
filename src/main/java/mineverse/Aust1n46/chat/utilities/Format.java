@@ -2,16 +2,15 @@ package mineverse.Aust1n46.chat.utilities;
 
 import static mineverse.Aust1n46.chat.MineverseChat.getInstance;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mineverse.Aust1n46.chat.MineverseChat;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
@@ -787,11 +786,6 @@ public class Format {
 		return string;
 	}
 
-	public static String escapeAllRegex(String input) {
-		return input.replace("[", "\\[").replace("]", "\\]").replace("{", "\\{").replace("}", "\\}").replace("(", "\\(")
-				.replace(")", "\\)").replace("|", "\\|").replace("+", "\\+").replace("*", "\\*");
-	}
-
 	public static String underlineURLs() {
 		final boolean configValue = getInstance().getConfig().getBoolean("underlineurls", true);
 		if (VersionHandler.isAtLeast_1_20_4()) {
@@ -848,96 +842,49 @@ public class Format {
 		}
 		return timeString.trim();
 	}
-	
-	public static long parseTimeStringToMillis(String timeInput) {
-		long millis = 0L;
-		timeInput = timeInput.toLowerCase();
-		char validChars[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'd', 'h', 'm', 's' };
-		if(containsInvalidChars(validChars, timeInput)) {
-			return -1;
+
+	public static void broadcastToServer(CommandSender sender, String message) {
+		if (message == null || message.isBlank()) {
+			return;
 		}
-		
-		long countDayTokens = timeInput.chars().filter(ch -> ch == 'd').count();
-		long countHourTokens = timeInput.chars().filter(ch -> ch == 'h').count();
-		long countMinuteTokens = timeInput.chars().filter(ch -> ch == 'm').count();
-		long countSecondTokens = timeInput.chars().filter(ch -> ch == 's').count();
-		if(countDayTokens > 1 || countHourTokens > 1 || countMinuteTokens > 1 || countSecondTokens > 1) {
-			return -1;
-		}
-		
-		int indexOfSecondToken = timeInput.indexOf("s");
-		int indexOfMinuteToken = timeInput.indexOf("m");
-		int indexOfHourToken = timeInput.indexOf("h");
-		int indexOfDayToken = timeInput.indexOf("d");
-		if(indexOfDayToken != -1) {
-			if((indexOfHourToken != -1 && indexOfHourToken < indexOfDayToken) || (indexOfMinuteToken != -1 && indexOfMinuteToken < indexOfDayToken) || (indexOfSecondToken != -1 && indexOfSecondToken < indexOfDayToken)) {
-				return -1;
+		String formattedMessage = FormatString(processPlaceHolders(sender, message));
+		UUID senderUuid = sender instanceof Player player
+				? player.getUniqueId()
+				: null;
+
+		for (MineverseChatPlayer mcp : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
+			Player target = mcp.getPlayer();
+
+			if (target == null || !target.isOnline()) {
+				continue;
 			}
-		}
-		if(indexOfHourToken != -1) {
-			if((indexOfMinuteToken != -1 && indexOfMinuteToken < indexOfHourToken) || (indexOfSecondToken != -1 && indexOfSecondToken < indexOfHourToken)) {
-				return -1;
+
+			if (senderUuid != null && mcp.getIgnores().contains(senderUuid)) {
+				continue;
 			}
-		}
-		if(indexOfMinuteToken != -1) {
-			if((indexOfSecondToken != -1 && indexOfSecondToken < indexOfMinuteToken)) {
-				return -1;
-			}
-		}
-		
-		if(indexOfDayToken != -1) {
-			int numberOfDays = Integer.parseInt(timeInput.substring(0, indexOfDayToken));
-			timeInput = timeInput.substring(indexOfDayToken + 1);
-			millis += MILLISECONDS_PER_DAY * numberOfDays;
-		}
-		if(timeInput.length() > 0) {
-			indexOfHourToken = timeInput.indexOf("h");
-			if(indexOfHourToken != -1) {
-				int numberOfHours = Integer.parseInt(timeInput.substring(0, indexOfHourToken));
-				timeInput = timeInput.substring(indexOfHourToken + 1);
-				millis += MILLISECONDS_PER_HOUR * numberOfHours;
-			}
-		}
-		if(timeInput.length() > 0) {
-			indexOfMinuteToken = timeInput.indexOf("m");
-			if(indexOfMinuteToken != -1) {
-				int numberOfMinutes = Integer.parseInt(timeInput.substring(0, indexOfMinuteToken));
-				timeInput = timeInput.substring(indexOfMinuteToken + 1);
-				millis += MILLISECONDS_PER_MINUTE * numberOfMinutes;
-			}
-		}
-		if(timeInput.length() > 0) {
-			indexOfSecondToken = timeInput.indexOf("s");
-			if(indexOfSecondToken != -1) {
-				int numberOfSeconds = Integer.parseInt(timeInput.substring(0, indexOfSecondToken));
-				timeInput = timeInput.substring(indexOfSecondToken + 1);
-				millis += MILLISECONDS_PER_SECOND * numberOfSeconds;
-			}
-		}
-		return millis;
-	}
-	
-	private static boolean containsInvalidChars(char[] validChars, String validate) {
-		for(char c : validate.toCharArray()) {
-			boolean isValidChar = false;
-			for(char v : validChars) {
-				if(c == v) {
-					isValidChar = true;
-				}
-			}
-			if(!isValidChar) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public static void broadcastToServer(String message) {
-		for(MineverseChatPlayer mcp : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
-			mcp.getPlayer().sendMessage(message);
+
+			target.sendMessage(formattedMessage);
 		}
 	}
-	
+
+	public static String processPlaceHolders(CommandSender sender, String string){
+		if (string == null || string.isBlank()) {
+			return string;
+		}
+
+		if (sender instanceof Player player) {
+			return PlaceholderAPI.setPlaceholders(player, string);
+		}
+
+		string = string.replace("%player_name%", sender.getName())
+				.replace("{player_name}", sender.getName());
+		string = string.replaceAll("%[^%]+%", "");
+		string = string.replaceAll("\\{[^}]+}", "");
+
+		return string;
+	}
+
+
 	public static void playMessageSound(MineverseChatPlayer mcp) {
 		Player player = mcp.getPlayer();
 		String soundName = getInstance().getConfig().getString("message_sound", DEFAULT_MESSAGE_SOUND);

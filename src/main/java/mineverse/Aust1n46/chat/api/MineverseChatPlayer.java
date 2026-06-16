@@ -47,14 +47,15 @@ public class MineverseChatPlayer {
 	
 	@Deprecated
 	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String nickname, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
-		this(uuid, name, currentChannel, ignores, listening, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
+		this(uuid, name, ignores, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
 	}
 	
-	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
+	public MineverseChatPlayer(UUID uuid, String name, Set<UUID> ignores, boolean host, UUID party, boolean filter, boolean notifications, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
 		this.uuid = uuid;
 		this.name = name;
 		this.ignores = ignores;
 		this.party = party;
+		this.host = host;
 		this.filter = filter;
 		this.notifications = notifications;
 		this.online = false;

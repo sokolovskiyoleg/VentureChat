@@ -50,25 +50,10 @@ public class PlayerData {
                     continue;
                 }
                 String name = playerData.getConfigurationSection("players." + uuid).getString("name");
-                String currentChannelName = playerData.getConfigurationSection("players." + uuid).getString("current");
-                ChatChannel currentChannel = ChatChannel.isChannel(currentChannelName) ? ChatChannel.getChannel(currentChannelName) : ChatChannel.getDefaultChannel();
                 Set<UUID> ignores = new HashSet<UUID>();
                 StringTokenizer i = new StringTokenizer(playerData.getConfigurationSection("players." + uuidString).getString("ignores"), ",");
                 while (i.hasMoreTokens()) {
                     ignores.add(UUID.fromString(i.nextToken()));
-                }
-                Set<String> listening = new HashSet<String>();
-                StringTokenizer l = new StringTokenizer(playerData.getConfigurationSection("players." + uuidString).getString("listen"), ",");
-                while (l.hasMoreTokens()) {
-                    String channel = l.nextToken();
-                    if (ChatChannel.isChannel(channel)) {
-                        listening.add(channel);
-                    }
-                }
-                Set<String> blockedCommands = new HashSet<String>();
-                StringTokenizer b = new StringTokenizer(playerData.getConfigurationSection("players." + uuidString).getString("blockedcommands"), ",");
-                while (b.hasMoreTokens()) {
-                    blockedCommands.add(b.nextToken());
                 }
                 boolean host = playerData.getConfigurationSection("players." + uuidString).getBoolean("host");
                 UUID party = playerData.getConfigurationSection("players." + uuidString).getString("party").length() > 0 ? UUID.fromString(playerData.getConfigurationSection("players." + uuidString).getString("party")) : null;
@@ -79,7 +64,7 @@ public class PlayerData {
                 boolean commandSpy = playerData.getConfigurationSection("players." + uuidString).getBoolean("commandspy", false);
                 boolean rangedSpy = playerData.getConfigurationSection("players." + uuidString).getBoolean("rangedspy", false);
                 boolean messageToggle = playerData.getConfigurationSection("players." + uuidString).getBoolean("messagetoggle", true);
-                MineverseChatPlayer mcp = new MineverseChatPlayer(uuid, name, currentChannel, ignores, listening, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
+                MineverseChatPlayer mcp = new MineverseChatPlayer(uuid, name, ignores, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
                 mcp.setModified(true);
                 MineverseChatAPI.addMineverseChatPlayerToMap(mcp);
                 MineverseChatAPI.addNameToMap(mcp);
@@ -130,26 +115,10 @@ public class PlayerData {
                 return;
             }
             String name = playerDataFileYamlConfiguration.getString("name");
-            String currentChannelName = playerDataFileYamlConfiguration.getString("current");
-            ChatChannel currentChannel = ChatChannel.isChannel(currentChannelName) ? ChatChannel.getChannel(currentChannelName) : ChatChannel.getDefaultChannel();
             Set<UUID> ignores = new HashSet<UUID>();
             StringTokenizer i = new StringTokenizer(playerDataFileYamlConfiguration.getString("ignores"), ",");
             while (i.hasMoreTokens()) {
                 ignores.add(UUID.fromString(i.nextToken()));
-            }
-            Set<String> listening = new HashSet<String>();
-            StringTokenizer l = new StringTokenizer(playerDataFileYamlConfiguration.getString("listen"), ",");
-            while (l.hasMoreTokens()) {
-                String channel = l.nextToken();
-                if (ChatChannel.isChannel(channel)) {
-                    listening.add(channel);
-                }
-            }
-
-            Set<String> blockedCommands = new HashSet<String>();
-            StringTokenizer b = new StringTokenizer(playerDataFileYamlConfiguration.getString("blockedcommands"), ",");
-            while (b.hasMoreTokens()) {
-                blockedCommands.add(b.nextToken());
             }
             boolean host = playerDataFileYamlConfiguration.getBoolean("host");
             UUID party = playerDataFileYamlConfiguration.getString("party").length() > 0 ? UUID.fromString(playerDataFileYamlConfiguration.getString("party")) : null;
@@ -160,10 +129,11 @@ public class PlayerData {
             boolean commandSpy = playerDataFileYamlConfiguration.getBoolean("commandspy", false);
             boolean rangedSpy = playerDataFileYamlConfiguration.getBoolean("rangedspy", false);
             boolean messageToggle = playerDataFileYamlConfiguration.getBoolean("messagetoggle", true);
-            mcp = new MineverseChatPlayer(uuid, name, currentChannel, ignores, listening, blockedCommands, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
+            mcp = new MineverseChatPlayer(uuid, name, ignores, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
         } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - Error Loading Data File: " + playerDataFile.getName()));
-            Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - File will be skipped and deleted."));
+            Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - File will be skipped and deleted." ));
+            e.printStackTrace();
             playerDataFile.delete();
             return;
         }

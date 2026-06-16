@@ -66,7 +66,7 @@ public class CommandListener implements Listener {
 			int cmdEnd = cmdName.length() + 1;
 			for (String s : a.getComponents()) {
 				if (!mcp.getPlayer().hasPermission(a.getPermission()) && a.hasPermission()) {
-					mcp.getPlayer().sendMessage(LocalizedMessage.ALIAS_NO_PERMISSION.toString());
+					mcp.getPlayer().sendMessage(LocalizedMessage.ALIAS_NO_PERMISSIONS.toString());
 					event.setCancelled(true);
 					return;
 				}
@@ -79,10 +79,13 @@ public class CommandListener implements Listener {
 				String[] args = message.substring(cmdEnd + num).split(" ");
 				String send = "";
 				if (args.length - arg < a.getArguments()) {
-					String keyword = "arguments.";
-					if (a.getArguments() == 1)
-						keyword = "argument.";
-					mcp.getPlayer().sendMessage(ChatColor.RED + "Invalid arguments for this alias, enter at least " + a.getArguments() + " " + keyword);
+					String aliasMessage;
+					if (a.getArguments() == 1) {
+						aliasMessage = LocalizedMessage.ALIAS_INVALID_ARGUMENTS_SINGULAR.toString();
+					} else {
+						aliasMessage = LocalizedMessage.ALIAS_INVALID_ARGUMENTS_PLURAL.toString().replace("{args}", String.valueOf(a.getArguments()));
+					}
+					mcp.getPlayer().sendMessage(aliasMessage);
 					event.setCancelled(true);
 					return;
 				}

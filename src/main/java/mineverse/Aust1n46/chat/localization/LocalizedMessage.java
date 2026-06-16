@@ -11,6 +11,7 @@ public enum LocalizedMessage {
     CLEAR_CHAT_SERVER("ClearChatServer"),
     CHANNEL_COOLDOWN("ChannelCooldown"),
     CHANNEL_NO_SPEAK_PERMISSIONS("ChannelNoSpeakPermissions"),
+    ALIAS_NO_PERMISSION("AliasNoPermission"),
     COMMAND_INVALID_ARGUMENTS("CommandInvalidArguments"),
     COMMAND_INVALID_ARGUMENTS_IGNORE("CommandInvalidArgumentsIgnore"),
     COMMAND_MUST_BE_RUN_BY_PLAYER("CommandMustBeRunByPlayer"),

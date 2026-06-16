@@ -17,6 +17,7 @@ import mineverse.Aust1n46.chat.alias.Alias;
 import mineverse.Aust1n46.chat.api.MineverseChatAPI;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
 import mineverse.Aust1n46.chat.database.Database;
+import mineverse.Aust1n46.chat.localization.LocalizedMessage;
 import mineverse.Aust1n46.chat.utilities.Format;
 
 public class CommandListener implements Listener {
@@ -65,7 +66,7 @@ public class CommandListener implements Listener {
 			int cmdEnd = cmdName.length() + 1;
 			for (String s : a.getComponents()) {
 				if (!mcp.getPlayer().hasPermission(a.getPermission()) && a.hasPermission()) {
-					mcp.getPlayer().sendMessage(ChatColor.RED + "You do not have permission for this alias.");
+					mcp.getPlayer().sendMessage(LocalizedMessage.ALIAS_NO_PERMISSION.toString());
 					event.setCancelled(true);
 					return;
 				}

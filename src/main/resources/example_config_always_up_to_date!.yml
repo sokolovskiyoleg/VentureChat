@@ -156,9 +156,8 @@ underlineurls: true
 
 # broadcast information
 broadcast:
-  color: red
   permissions: venturechat.adminchannel
-  displaytag: '[Broadcast]'
+  format: '&8[&cBroadcast&8] {message} &7(написал: %player_name%)'
 
 # Use $ to include arguments into the message
 # Valid component types are:

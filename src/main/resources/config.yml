@@ -35,16 +35,6 @@ filters:
 - pmc,another dimension
 - ((\d+\.){3}\d+),another dimension
 
-# command without the /
-blockablecommands:
-- vote
-- me
-
-# blacklisted nicknames 
-nicknames:
-- Notch
-
-nickname-in-tablist: true
 
 # {player} : player sending command
 # {command} : command typed
@@ -119,8 +109,6 @@ ignorechat: false
 # The message shown to players alerting them no one is in the channel to hear them
 emptychannelalert: "&6No one is listening to you."
 
-messageremoverpermissions: '&cYou need additional permissions to view this message!'
-messageremovertext: '&c&o<message removed>'
 
 # The name of the group is the permissions node for the format
 # Example: venturechat.json.Owner is the node for the group Owner
@@ -179,6 +167,7 @@ broadcast:
 # Command: Sends a message or command in chat
 # Message: Sends a message to the player
 # Broadcast: Sends a broadcast to all players on the server
+# Json: Sends a raw JSON component to the player
 # Permissions automatically include "venturechat." 
 # Example: permissions: alert equals venturechat.alert
 # Use None for no permissions

@@ -9,6 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 import mineverse.Aust1n46.chat.MineverseChat;
 import mineverse.Aust1n46.chat.alias.Alias;
@@ -88,6 +90,13 @@ public class CommandListener implements Listener {
 				}
 				if (send.length() > 0)
 					send = send.substring(1);
+				if (s.startsWith("Json:")) {
+					String json = s.substring(5).replace("$", send);
+					BaseComponent[] components = ComponentSerializer.parse(json);
+					mcp.getPlayer().spigot().sendMessage(components);
+					event.setCancelled(true);
+					continue;
+				}
 				s = Format.FormatStringAll(s);
 				if (mcp.getPlayer().hasPermission("venturechat.color.legacy")) {
 					send = Format.FormatStringLegacyColor(send);

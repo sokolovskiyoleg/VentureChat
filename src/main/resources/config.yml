@@ -68,6 +68,11 @@ mysql:
 # Severe: Only show severe messages
 loglevel: info
 
+# Language file to load for configurable messages.
+# Custom languages go in plugins/VentureChat/language/<code>.yml
+# Built-in defaults are bundled under src/main/resources/language/
+language: en-us
+
 # saveinterval is in minutes
 saveinterval: 30
 

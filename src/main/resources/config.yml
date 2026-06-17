@@ -103,6 +103,9 @@ partyformat: Default
 
 formatcleaner: true
 
+# If true, /msg <player> without message starts a private conversation (toggle with repeat)
+private_conversation_toggle: true
+
 # If true, /ignore will block chat from the ignored player as well as PM's
 ignorechat: false
 # If true /ignore will block broadcasts from the ignored player

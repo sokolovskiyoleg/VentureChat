@@ -112,7 +112,7 @@ public class Message extends Command {
 			}
 		}
 		if (args.length == 1) {
-			if (args[0].length() > 0) {
+			if (plugin.getConfig().getBoolean("private_conversation_toggle", true)) {
 				if (!mcp.hasConversation() || (mcp.hasConversation() && !mcp.getConversation().toString().equals(player.getUUID().toString()))) {
 					mcp.setConversation(player.getUUID());
 					if (!mcp.getPlayer().hasPermission("venturechat.spy.override")) {
@@ -142,6 +142,8 @@ public class Message extends Command {
 					}
 					mcp.getPlayer().sendMessage(LocalizedMessage.EXIT_PRIVATE_CONVERSATION.toString().replace("{player_receiver}", player.getName()));
 				}
+			} else {
+				mcp.getPlayer().sendMessage(LocalizedMessage.COMMAND_INVALID_ARGUMENTS.toString().replace("{command}", "/msg").replace("{args}", "[player] [message]"));
 			}
 		}
 		return true;

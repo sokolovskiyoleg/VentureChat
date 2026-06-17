@@ -872,15 +872,9 @@ public class Format {
 		if (string == null || string.isBlank()) {
 			return string;
 		}
-
 		if (sender instanceof Player player) {
 			return PlaceholderAPI.setPlaceholders(player, string);
 		}
-
-		string = string.replace("%player_name%", sender.getName())
-				.replace("{player_name}", sender.getName());
-		string = string.replaceAll("%[^%]+%", "");
-		string = string.replaceAll("\\{[^}]+}", "");
 
 		return string;
 	}

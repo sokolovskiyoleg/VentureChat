@@ -160,8 +160,11 @@ underlineurls: true
 # broadcast information
 broadcast:
   permissions: venturechat.adminchannel
-  format: '&8[&cBroadcast&8] {message} &7(%player_name%)'
-  
+  #Any placeholders will be processed
+  player_format: '&8[&cBroadcast&8] {message} &7(%player_name%)'
+  #No placeholders will be processed
+  console_format: '&8[&4CONSOLE&8] {message}'
+
 # Use $ to include arguments into the message  
 # Valid component types are:
 # Command: Sends a message or command in chat

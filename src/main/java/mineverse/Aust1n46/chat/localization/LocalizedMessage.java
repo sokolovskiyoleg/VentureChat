@@ -3,7 +3,7 @@ package mineverse.Aust1n46.chat.localization;
 import mineverse.Aust1n46.chat.utilities.Format;
 
 /**
- * Messages configurable in Messages.yml file.
+ * Messages configurable in the language files.
  */
 public enum LocalizedMessage {
     BLOCKING_MESSAGE("BlockingMessage"),

@@ -3,8 +3,11 @@ package mineverse.Aust1n46.chat.command;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -71,6 +74,7 @@ public class VentureCommandExecutor {
 		commands.put("message", new Message());
 		commands.put("ignore", new Ignore());
 		final ConfigurationSection commandsSection = commandsFileConfiguration.getConfigurationSection("commands");
+		final Set<String> messageAliases = new HashSet<>();
 		for (final String commandName : commandsSection.getKeys(false)) {
 			final ConfigurationSection commandSection = commandsSection.getConfigurationSection(commandName);
 			final boolean isEnabled = commandSection.getBoolean("enabled", true);
@@ -79,17 +83,28 @@ public class VentureCommandExecutor {
 			} else {
 				final Command command = commands.get(commandName);
 				if (command != null) {
+					final Set<String> aliases = new HashSet<>(commandSection.getStringList("aliases"));
 					command.setAliases(commandSection.getStringList("aliases"));
+					if ("message".equals(commandName)) {
+						messageAliases.clear();
+						messageAliases.addAll(aliases);
+					}
 				}
 			}
 		}
 		final CommandMap commandMap = getCommandMap(server);
-		registerAll(commandMap);
-		server.getScheduler().runTaskLater(plugin, () -> registerAll(commandMap), 10);
+		final boolean brigadierRegistered = registerPaperMessageCommands(messageAliases);
+		if (!brigadierRegistered) {
+			unregisterVanillaMessageCommands(commandMap, messageAliases);
+		}
+		registerAll(commandMap, brigadierRegistered ? Set.of("message") : Collections.emptySet());
 	}
 
-	private static void registerAll(final CommandMap commandMap) {
+	private static void registerAll(final CommandMap commandMap, final Set<String> skippedCommands) {
 		for (final Entry<String, Command> commandEntry : commands.entrySet()) {
+			if (skippedCommands.contains(commandEntry.getKey())) {
+				continue;
+			}
 			commandMap.register("venturechat", commandEntry.getValue());
 		}
 	}
@@ -105,6 +120,41 @@ public class VentureCommandExecutor {
 			} catch (final ReflectiveOperationException ex) {
 				throw new RuntimeException("Unable to access CommandMap. Use Paper.", ex);
 			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void unregisterVanillaMessageCommands(final CommandMap commandMap, final Set<String> messageAliases) {
+		if (messageAliases == null || messageAliases.isEmpty()) {
+			return;
+		}
+		try {
+			final Field knownCommandsField = commandMap.getClass().getDeclaredField("knownCommands");
+			knownCommandsField.setAccessible(true);
+			final Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
+			final Set<String> labelsToRemove = new HashSet<>(messageAliases);
+			labelsToRemove.retainAll(Set.of("msg", "tell", "whisper", "pm"));
+			if (labelsToRemove.isEmpty()) {
+				return;
+			}
+			for (final String label : new HashSet<>(knownCommands.keySet())) {
+				final String normalizedLabel = label.contains(":") ? label.substring(label.indexOf(':') + 1) : label;
+				if (labelsToRemove.contains(normalizedLabel)) {
+					knownCommands.remove(label);
+				}
+			}
+		} catch (final ReflectiveOperationException ex) {
+			plugin.getLogger().warning("Unable to clear vanilla message commands. /msg may stay mapped to the server command.");
+		}
+	}
+
+	private static boolean registerPaperMessageCommands(final Set<String> messageAliases) {
+		try {
+			PaperCommand.registerMessageCommands(plugin, messageAliases);
+			return true;
+		} catch (final Throwable ex) {
+			plugin.getLogger().warning("Unable to register Brigadier message commands. Falling back to CommandMap.");
+			return false;
 		}
 	}
 }

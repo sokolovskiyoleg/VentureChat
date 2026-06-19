@@ -125,14 +125,17 @@ public class ChatListener implements Listener {
 			return true;
 		}
 
-		String filtered = prepareFilteredChat(mcp, chat);
+		//String filtered = prepareFilteredChat(mcp, chat);
+		String rawChat = chat;
+		String filteredForSender = prepareFilteredChat(mcp, rawChat);
+		String filteredForReceiver = prepareFilteredChat(tp, rawChat);
 		String send = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), plugin.getConfig().getString("tellformatfrom").replaceAll("sender_", "")));
 		String echo = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), plugin.getConfig().getString("tellformatto").replaceAll("sender_", "")));
 		String spy = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), plugin.getConfig().getString("tellformatspy").replaceAll("sender_", "")));
 
-		send = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(tp.getPlayer(), send.replaceAll("receiver_", ""))) + filtered;
-		echo = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(tp.getPlayer(), echo.replaceAll("receiver_", ""))) + filtered;
-		spy = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(tp.getPlayer(), spy.replaceAll("receiver_", ""))) + filtered;
+		send = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(tp.getPlayer(), send.replaceAll("receiver_", ""))) + filteredForReceiver;
+		echo = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(tp.getPlayer(), echo.replaceAll("receiver_", ""))) + filteredForSender;
+		spy = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(tp.getPlayer(), spy.replaceAll("receiver_", ""))) + filteredForReceiver;
 
 		if (!mcp.getPlayer().hasPermission("venturechat.spy.override")) {
 			for (MineverseChatPlayer p : MineverseChatAPI.getOnlineMineverseChatPlayers()) {
@@ -257,18 +260,37 @@ public class ChatListener implements Listener {
 
 		String format = Format.FormatStringAll(eventChannel.getFormat());
 		String formattedPrefix = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), format));
-		String filteredChat = prepareFilteredChat(mcp, chat);
-		if (!Format.startsWithColorCode(filteredChat)) {
-			filteredChat = Format.getLastCode(formattedPrefix) + filteredChat;
-		}
-		ChatFormat chatFormat = ChatFormat.selectChatFormat(mcp.getPlayer(), ChatFormat.getChatFormats());
-		if (chatFormat == null) {
-			chatFormat = ChatFormat.fallbackFormat("Default");
-		}
-		Component displayComponent = chatFormat.render(mcp.getPlayer(), format, filteredChat);
-		format = Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(mcp.getPlayer(), Format.FormatStringAll(format)));
-		String message = Format.stripColor(format + filteredChat);
-		int hash = message.hashCode();
+		String rawChat = chat;
+		event.renderer((source, sourceDisplayName, message, viewer) -> {
+			MineverseChatPlayer viewerMcp = (viewer instanceof Player p)
+					? MineverseChatAPI.getOnlineMineverseChatPlayer(p)
+					: mcp;
+
+			if (viewerMcp == null) {
+				viewerMcp = mcp;
+			}
+
+			String filteredChat = prepareFilteredChat(viewerMcp, rawChat);
+
+			if (!Format.startsWithColorCode(filteredChat)) {
+				filteredChat = Format.getLastCode(formattedPrefix) + filteredChat;
+			}
+
+			ChatFormat chatFormat = ChatFormat.selectChatFormat(viewerMcp.getPlayer(), ChatFormat.getChatFormats());
+			if (chatFormat == null) {
+				chatFormat = ChatFormat.fallbackFormat("Default");
+			}
+
+			return chatFormat.render(mcp.getPlayer(), format, filteredChat);
+		});
+
+		ChatFormat defaultFormat = ChatFormat.selectChatFormat(mcp.getPlayer(), ChatFormat.getChatFormats());
+		if (defaultFormat == null) defaultFormat = ChatFormat.fallbackFormat("Default");
+
+		Component displayComponentForEvent = defaultFormat.render(mcp.getPlayer(), format, prepareFilteredChat(mcp, rawChat));
+
+		String messageForEvent = Format.stripColor(format + prepareFilteredChat(mcp, rawChat));
+		int hash = messageForEvent.hashCode();
 
 		VentureChatEvent ventureChatEvent = new VentureChatEvent(
 				mcp,
@@ -279,11 +301,11 @@ public class ChatListener implements Listener {
 				recipients,
 				recipients.size(),
 				format,
-				filteredChat,
-				displayComponent,
+				rawChat,
+				displayComponentForEvent,
 				hash);
+
 		Bukkit.getServer().getPluginManager().callEvent(ventureChatEvent);
-		event.renderer(ChatRenderer.viewerUnaware((source, sourceDisplayName, renderedMessage) -> displayComponent));
 
 		if (recipients.isEmpty()) {
 			String emptyAlert = plugin.getConfig().getString("emptychannelalert", "&6No one is listening to you.");
@@ -293,12 +315,14 @@ public class ChatListener implements Listener {
 		}
 
 		if (essentialsDiscordHook) {
-			Bukkit.getServicesManager().load(DiscordService.class).sendChatMessage(mcp.getPlayer(), filteredChat);
+			Bukkit.getServicesManager().load(DiscordService.class).sendChatMessage(mcp.getPlayer(), rawChat);
 		}
+
 		if (Database.isEnabled()) {
-			Database.writeVentureChat(mcp.getUUID().toString(), mcp.getName(), "Local", eventChannel.getName(), filteredChat.replace("'", "''"), "Chat");
+			Database.writeVentureChat(mcp.getUUID().toString(), mcp.getName(), "Local", eventChannel.getName(), rawChat.replace("'", "''"), "Chat");
 		}
-		mcp.addMessage(new mineverse.Aust1n46.chat.ChatMessage(displayComponent, message, format + filteredChat, hash));
+
+		mcp.addMessage(new mineverse.Aust1n46.chat.ChatMessage(displayComponentForEvent, messageForEvent, format + prepareFilteredChat(mcp, rawChat), hash));
 	}
 
 	private void filterRecipients(AsyncChatEvent event, MineverseChatPlayer mcp, ChatChannel eventChannel, double chDistance,
@@ -388,19 +412,24 @@ public class ChatListener implements Listener {
 		return Math.abs(diff.getX()) > chDistance || Math.abs(diff.getZ()) > chDistance || Math.abs(diff.getY()) > chDistance;
 	}
 
-	private String prepareFilteredChat(MineverseChatPlayer mcp, String chat) {
+	private String prepareFilteredChat(MineverseChatPlayer viewer, String chat) {
+		if (chat == null) return " ";
 		String filtered = chat;
-		if (mcp.hasFilter()) {
+		if (viewer != null && viewer.hasFilter()) {
 			filtered = Format.FilterChat(filtered);
 		}
-		if (mcp.getPlayer().hasPermission("venturechat.color.legacy")) {
-			filtered = Format.FormatStringLegacyColor(filtered);
-		}
-		if (mcp.getPlayer().hasPermission("venturechat.color")) {
-			filtered = Format.FormatStringColor(filtered);
-		}
-		if (mcp.getPlayer().hasPermission("venturechat.format")) {
-			filtered = Format.FormatString(filtered);
+
+		if (viewer != null && viewer.getPlayer() != null) {
+			Player p = viewer.getPlayer();
+			if (p.hasPermission("venturechat.color.legacy")) {
+				filtered = Format.FormatStringLegacyColor(filtered);
+			}
+			if (p.hasPermission("venturechat.color")) {
+				filtered = Format.FormatStringColor(filtered);
+			}
+			if (p.hasPermission("venturechat.format")) {
+				filtered = Format.FormatString(filtered);
+			}
 		}
 		return " " + filtered;
 	}

@@ -50,6 +50,7 @@ public class FormatTest {
 		mockConfig = Mockito.mock(FileConfiguration.class);
 		Mockito.when(mockPlugin.getConfig()).thenReturn(mockConfig);
 		Mockito.when(mockConfig.getStringList("filters")).thenReturn(filters);
+		Mockito.when(mockConfig.getBoolean("underlineurls", true)).thenReturn(true);
 	}
 
 	@After
@@ -187,5 +188,23 @@ public class FormatTest {
 
 		String result = Format.FormatStringLegacyColor(input);
 		assertEquals(expectedResult, result);
+	}
+
+	@Test
+	public void testStartsWithColorCodeIgnoresLeadingWhitespace() {
+		assertTrue(Format.startsWithColorCode("   " + BUKKIT_COLOR_CODE_PREFIX + "1Hello"));
+	}
+
+	@Test
+	public void testStartsWithColorCodeRejectsPlainText() {
+		assertFalse(Format.startsWithColorCode("Hello " + BUKKIT_COLOR_CODE_PREFIX + "1"));
+	}
+
+	@Test
+	public void testLegacyToComponentWithUrlsKeepsPlainText() {
+		String input = "&aVisit http://example.com";
+		String result = Format.componentToPlainText(Format.legacyToComponentWithUrls(Format.FormatStringAll(input)));
+
+		assertEquals("Visit http://example.com", result);
 	}
 }

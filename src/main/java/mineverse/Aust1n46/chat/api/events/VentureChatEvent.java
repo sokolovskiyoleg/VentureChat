@@ -9,6 +9,8 @@ import org.bukkit.event.HandlerList;
 import mineverse.Aust1n46.chat.MineverseChat;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 /**
  * Event called when a message has been sent to a channel.
@@ -27,10 +29,10 @@ public class VentureChatEvent extends Event {
 	private final int recipientCount; //For not counting vanished players
 	private final String format;
 	private final String chat;
-	private final String globalJSON;
+	private final Component globalComponent;
 	private final int hash;
 	
-	public VentureChatEvent(MineverseChatPlayer mcp, String username, String nickname, String playerPrimaryGroup, ChatChannel channel, Set<Player> recipients, int recipientCount, String format, String chat, String globalJSON, int hash) {
+	public VentureChatEvent(MineverseChatPlayer mcp, String username, String nickname, String playerPrimaryGroup, ChatChannel channel, Set<Player> recipients, int recipientCount, String format, String chat, Component globalComponent, int hash) {
 		super(MineverseChat.ASYNC);
 		this.mcp = mcp;
 		this.username = username;
@@ -41,7 +43,7 @@ public class VentureChatEvent extends Event {
 		this.recipientCount = recipientCount;
 		this.format = format;
 		this.chat = chat;
-		this.globalJSON = globalJSON;
+		this.globalComponent = globalComponent;
 		this.hash = hash;
 	}
 	
@@ -86,8 +88,16 @@ public class VentureChatEvent extends Event {
 		return this.format + this.chat;
 	}
 	
+	public Component getGlobalComponent() {
+		return this.globalComponent;
+	}
+
+	@Deprecated
 	public String getGlobalJSON() {
-		return this.globalJSON;
+		if (this.globalComponent == null) {
+			return "";
+		}
+		return GsonComponentSerializer.gson().serialize(this.globalComponent);
 	}
 	
 	public int getHash() {

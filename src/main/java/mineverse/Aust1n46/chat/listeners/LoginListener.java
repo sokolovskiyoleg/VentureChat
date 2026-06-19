@@ -60,6 +60,6 @@ public class LoginListener implements Listener {
 		mcp.setOnline(true);
 		mcp.setHasPlayed(false);
 		MineverseChatAPI.addMineverseChatOnlinePlayerToMap(mcp);
-		mcp.setJsonFormat();
+		mcp.setChatFormat();
 	}
 }

@@ -46,7 +46,7 @@ public class Chatreload extends Command {
 				}
 				mcp.setOnline(true);
 				mcp.setHasPlayed(false);
-				mcp.setJsonFormat();
+				mcp.setChatFormat();
 				MineverseChatAPI.addMineverseChatOnlinePlayerToMap(mcp);
 				MineverseChatAPI.addNameToMap(mcp);
 			}

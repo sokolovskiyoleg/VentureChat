@@ -7,26 +7,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mineverse.Aust1n46.chat.MineverseChat;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-
 import me.clip.placeholderapi.PlaceholderAPI;
-import mineverse.Aust1n46.chat.ClickAction;
 import mineverse.Aust1n46.chat.api.MineverseChatAPI;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
-import mineverse.Aust1n46.chat.json.JsonAttribute;
-import mineverse.Aust1n46.chat.json.JsonFormat;
 import mineverse.Aust1n46.chat.localization.LocalizedMessage;
 import mineverse.Aust1n46.chat.versions.VersionHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -44,8 +44,11 @@ public class Format {
 	private static final Pattern LEGACY_CHAT_COLOR_DIGITS_PATTERN = Pattern.compile("&([0-9])");
 	private static final Pattern LEGACY_CHAT_COLOR_PATTERN = Pattern.compile(
 			"(?<!(&x(&[a-fA-F0-9]){5}))(?<!(&x(&[a-fA-F0-9]){4}))(?<!(&x(&[a-fA-F0-9]){3}))(?<!(&x(&[a-fA-F0-9]){2}))(?<!(&x(&[a-fA-F0-9]){1}))(?<!(&x))(&)([0-9a-fA-F])");
+	private static final Pattern LEADING_COLOR_CODE_PATTERN = Pattern.compile("^\\s*" + Pattern.quote(BUKKIT_COLOR_CODE_PREFIX)
+			+ "(?:x(?:" + Pattern.quote(BUKKIT_COLOR_CODE_PREFIX) + "[0-9a-fA-F]){6}|[0-9a-fA-FrR])");
 	
 	private static final Pattern PLACEHOLDERAPI_PLACEHOLDER_PATTERN = Pattern.compile("\\{([^\\{\\}]+)\\}");
+	private static final Pattern URL_PATTERN = Pattern.compile("(?i)\\b((?:https?://)?(?:www\\.)?[a-z0-9][a-z0-9.-]+\\.[a-z]{2,}(?:/[\\w\\-./?%&=+#~:]*)?)");
 	
 	public static final long MILLISECONDS_PER_DAY = 86400000;
 	public static final long MILLISECONDS_PER_HOUR = 3600000;
@@ -55,150 +58,278 @@ public class Format {
 	public static final String DEFAULT_MESSAGE_SOUND = "minecraft:entity.player.levelup";
 	public static final String DEFAULT_LEGACY_MESSAGE_SOUND = "LEVEL_UP";
 
-	/**
-     * Converts a message to Minecraft JSON formatting while applying the
-     * {@link JsonFormat} from the config.
-     *
-     * @param sender {@link MineverseChatPlayer} wrapper of the message sender.
-     * @param format The format section of the message.
-     * @param chat   The chat section of the message.
-     * @return {@link String}
-     */
-	public static String convertToJson(MineverseChatPlayer sender, String format, String chat) {
-		JsonFormat JSONformat = JsonFormat.getJsonFormat(sender.getJsonFormat());
-		String c = escapeJsonChars(chat);
-		String json = "[\"\",{\"text\":\"\",\"extra\":[";
-		json += convertPlaceholders(format, JSONformat, sender);
-		json += "]}";
-		json += "," + convertLinks(c);
-		json += "]";
-		if (getInstance().getConfig().getString("loglevel", "info").equals("debug")) {
-			System.out.println(json);
-			System.out.println("END OF JSON");
-			System.out.println("END OF JSON");
-			System.out.println("END OF JSON");
-			System.out.println("END OF JSON");
-			System.out.println("END OF JSON");
+	public static Component legacyToComponent(String legacyText) {
+		if (legacyText == null || legacyText.isBlank()) {
+			return Component.empty();
 		}
-		return json;
+		return LegacyComponentSerializer.legacySection().deserialize(legacyText);
 	}
 
-	/**
-     * Converts the format section of a message to JSON using PlaceholderAPI.
-     *
-     * @param s
-     * @param format
-     * @param icp
-     * @return {@link String}
-     */
-	private static String convertPlaceholders(String s, JsonFormat format, MineverseChatPlayer icp) {
-		String remaining = s;
-		String temp = "";
-		int indexStart = -1;
-		int indexEnd = -1;
-		String placeholder = "";
-		String formattedPlaceholder = "";
-		String lastCode = DEFAULT_COLOR_CODE;
-		do {
-			Matcher matcher = PLACEHOLDERAPI_PLACEHOLDER_PATTERN.matcher(remaining);
-			if (matcher.find()) {
-				indexStart = matcher.start();
-				indexEnd = matcher.end();
-				placeholder = remaining.substring(indexStart, indexEnd);
-				formattedPlaceholder = escapeJsonChars(Format.FormatStringAll(PlaceholderAPI.setBracketPlaceholders(icp.getPlayer(), placeholder)));
-				temp += convertToJsonColors(escapeJsonChars(lastCode + remaining.substring(0, indexStart))) + ",";
-				lastCode = getLastCode(lastCode + remaining.substring(0, indexStart));
-				boolean placeholderHasJsonAttribute = false;
-				for (JsonAttribute jsonAttribute : format.getJsonAttributes()) {
-					if (placeholder.contains(jsonAttribute.getName().replace("{", "").replace("}", ""))) {
-						final StringBuilder hover = new StringBuilder();
-						for (String st : jsonAttribute.getHoverText()) {
-							hover.append(Format.FormatStringAll(st) + "\n");
-						}
-						final String hoverText;
-						if(!hover.isEmpty()) {
-							hoverText = escapeJsonChars(Format.FormatStringAll(
-									PlaceholderAPI.setBracketPlaceholders(icp.getPlayer(), hover.substring(0, hover.length() - 1))));
-						} else {
-							hoverText = StringUtils.EMPTY;
-						}
-						final ClickAction clickAction = jsonAttribute.getClickAction();
-						final String actionJson;
-						if (clickAction == ClickAction.NONE) {
-							actionJson = StringUtils.EMPTY;
-						} else {
-							final String clickText = escapeJsonChars(Format.FormatStringAll(
-									PlaceholderAPI.setBracketPlaceholders(icp.getPlayer(), jsonAttribute.getClickText())));
-							actionJson = ",\"click_event\":{\"action\":\"" + jsonAttribute.getClickAction().toString() + "\",\"command\":\"" + clickText
-							+ "\"}";
-						}
-						final String hoverJson;
-						if (hoverText.isEmpty()) {
-							hoverJson = StringUtils.EMPTY;
-						} else {
-							hoverJson = ",\"hover_event\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":["
-									+ convertToJsonColors(hoverText) + "]}}";
-						}
-						temp += convertToJsonColors(lastCode + formattedPlaceholder, actionJson + hoverJson) + ",";
-						placeholderHasJsonAttribute = true;
-						break;
-					}
-				}
-				if (!placeholderHasJsonAttribute) {
-					temp += convertToJsonColors(lastCode + formattedPlaceholder) + ",";
-				}
-				lastCode = getLastCode(lastCode + formattedPlaceholder);
-				remaining = remaining.substring(indexEnd);
-			} else {
-				temp += convertToJsonColors(lastCode + remaining);
-				break;
-			}
-		} while (true);
-		return temp;
+	public static Component legacyToComponentWithUrls(String legacyText) {
+		if (legacyText == null || legacyText.isBlank()) {
+			return Component.empty();
+		}
+		List<LegacySegment> segments = splitLegacySegments(legacyText);
+		Component result = Component.empty();
+		boolean underlineUrls = getInstance().getConfig().getBoolean("underlineurls", true);
+		for (LegacySegment segment : segments) {
+			result = result.append(renderLegacySegment(segment, underlineUrls));
+		}
+		return result;
 	}
 
-	/**
-     * Converts URL's to JSON.
-     *
-     * @param s
-     * @return {@link String}
-     */
-	private static String convertLinks(String s) {
-		String remaining = s;
-		String temp = "";
-		int indexLink = -1;
-		int indexLinkEnd = -1;
-		String link = "";
-		String lastCode = DEFAULT_COLOR_CODE;
-		do {
-			Pattern pattern = Pattern.compile(
-					"([a-zA-Z0-9" + BUKKIT_COLOR_CODE_PREFIX + "\\-:/]+\\.[a-zA-Z/0-9" + BUKKIT_COLOR_CODE_PREFIX
-							+ "\\-:_#]+(\\.[a-zA-Z/0-9." + BUKKIT_COLOR_CODE_PREFIX + "\\-:;,#\\?\\+=_]+)?)");
-			Matcher matcher = pattern.matcher(remaining);
-			if (matcher.find()) {
-				indexLink = matcher.start();
-				indexLinkEnd = matcher.end();
-				link = remaining.substring(indexLink, indexLinkEnd);
-				temp += convertToJsonColors(lastCode + remaining.substring(0, indexLink)) + ",";
-				lastCode = getLastCode(lastCode + remaining.substring(0, indexLink));
-				String https = "";
-				if (ChatColor.stripColor(link).contains("https://"))
-					https = "s";
-				temp += convertToJsonColors(lastCode + link,
-						",\"underlined\":" + underlineURLs()
-								+ ",\"click_event\":{\"action\":\"open_url\",\"url\":\"http" + https + "://"
-								+ ChatColor.stripColor(link.replace("http://", "").replace("https://", ""))
-								+ "\"},\"hover_event\":{\"action\":\"show_text\",\"value\":{\"text\":\"\",\"extra\":["
-								+ convertToJsonColors(lastCode + link) + "]}}")
-						+ ",";
-				lastCode = getLastCode(lastCode + link);
-				remaining = remaining.substring(indexLinkEnd);
-			} else {
-				temp += convertToJsonColors(lastCode + remaining);
-				break;
+	private static Component renderLegacySegment(LegacySegment segment, boolean underlineUrls) {
+		Component result = Component.empty();
+		Matcher matcher = URL_PATTERN.matcher(segment.text());
+		int lastIndex = 0;
+		while (matcher.find()) {
+			String before = segment.text().substring(lastIndex, matcher.start());
+			if (!before.isEmpty()) {
+				result = result.append(Component.text(before).style(segment.style()));
 			}
-		} while (true);
-		return temp;
+			String url = matcher.group(1);
+			String clickTarget = normalizeUrl(url);
+			Style urlStyle = underlineUrls
+					? segment.style().decorate(TextDecoration.UNDERLINED)
+					: segment.style();
+			result = result.append(Component.text(url)
+					.style(urlStyle)
+					.clickEvent(ClickEvent.openUrl(clickTarget))
+					.hoverEvent(HoverEvent.showText(Component.text(clickTarget))));
+			lastIndex = matcher.end();
+		}
+		String tail = segment.text().substring(lastIndex);
+		if (!tail.isEmpty()) {
+			result = result.append(Component.text(tail).style(segment.style()));
+		}
+		return result;
+	}
+
+	private static List<LegacySegment> splitLegacySegments(String legacyText) {
+		List<LegacySegment> segments = new ArrayList<LegacySegment>();
+		StringBuilder buffer = new StringBuilder();
+		LegacyStyle style = new LegacyStyle();
+		for (int i = 0; i < legacyText.length();) {
+			char current = legacyText.charAt(i);
+			if (current == BUKKIT_COLOR_CODE_PREFIX_CHAR && i + 1 < legacyText.length()) {
+				if (buffer.length() > 0) {
+					segments.add(new LegacySegment(buffer.toString(), style.toStyle()));
+					buffer.setLength(0);
+				}
+				char code = legacyText.charAt(i + 1);
+				if ((code == 'x' || code == 'X') && isLegacyHexCode(legacyText, i)) {
+					style.applyHex(legacyText.substring(i + 2, i + 14));
+					i += 14;
+					continue;
+				}
+				if (style.apply(code)) {
+					i += 2;
+					continue;
+				}
+				buffer.append(current).append(code);
+				i += 2;
+			} else {
+				buffer.append(current);
+				i++;
+			}
+		}
+		if (buffer.length() > 0) {
+			segments.add(new LegacySegment(buffer.toString(), style.toStyle()));
+		}
+		return segments;
+	}
+
+	private static boolean isLegacyHexCode(String legacyText, int index) {
+		if (index + 13 >= legacyText.length()) {
+			return false;
+		}
+		for (int offset = 0; offset < 6; offset++) {
+			int sectionIndex = index + 2 + (offset * 2);
+			if (legacyText.charAt(sectionIndex) != BUKKIT_COLOR_CODE_PREFIX_CHAR) {
+				return false;
+			}
+			char digit = legacyText.charAt(sectionIndex + 1);
+			if (Character.digit(digit, 16) == -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static String normalizeUrl(String url) {
+		if (url == null || url.isBlank()) {
+			return "";
+		}
+		if (url.regionMatches(true, 0, "http://", 0, 7) || url.regionMatches(true, 0, "https://", 0, 8)) {
+			return url;
+		}
+		return "http://" + url;
+	}
+
+	public static String componentToPlainText(Component component) {
+		if (component == null) {
+			return "";
+		}
+		return PlainTextComponentSerializer.plainText().serialize(component);
+	}
+
+	public static void sendComponent(CommandSender sender, Component component) {
+		if (sender == null || component == null) {
+			return;
+		}
+		sender.sendMessage(component);
+	}
+
+	private static final class LegacySegment {
+		private final String text;
+		private final Style style;
+
+		private LegacySegment(String text, Style style) {
+			this.text = text;
+			this.style = style;
+		}
+
+		private String text() {
+			return text;
+		}
+
+		private Style style() {
+			return style;
+		}
+	}
+
+	private static final class LegacyStyle {
+		private TextColor color = NamedTextColor.WHITE;
+		private boolean bold;
+		private boolean obfuscated;
+		private boolean italic;
+		private boolean strikethrough;
+		private boolean underlined;
+
+		private boolean apply(char code) {
+			switch (Character.toLowerCase(code)) {
+			case '0':
+				setColor(NamedTextColor.BLACK);
+				return true;
+			case '1':
+				setColor(NamedTextColor.DARK_BLUE);
+				return true;
+			case '2':
+				setColor(NamedTextColor.DARK_GREEN);
+				return true;
+			case '3':
+				setColor(NamedTextColor.DARK_AQUA);
+				return true;
+			case '4':
+				setColor(NamedTextColor.DARK_RED);
+				return true;
+			case '5':
+				setColor(NamedTextColor.DARK_PURPLE);
+				return true;
+			case '6':
+				setColor(NamedTextColor.GOLD);
+				return true;
+			case '7':
+				setColor(NamedTextColor.GRAY);
+				return true;
+			case '8':
+				setColor(NamedTextColor.DARK_GRAY);
+				return true;
+			case '9':
+				setColor(NamedTextColor.BLUE);
+				return true;
+			case 'a':
+				setColor(NamedTextColor.GREEN);
+				return true;
+			case 'b':
+				setColor(NamedTextColor.AQUA);
+				return true;
+			case 'c':
+				setColor(NamedTextColor.RED);
+				return true;
+			case 'd':
+				setColor(NamedTextColor.LIGHT_PURPLE);
+				return true;
+			case 'e':
+				setColor(NamedTextColor.YELLOW);
+				return true;
+			case 'f':
+				setColor(NamedTextColor.WHITE);
+				return true;
+			case 'k':
+				this.obfuscated = true;
+				return true;
+			case 'l':
+				this.bold = true;
+				return true;
+			case 'm':
+				this.strikethrough = true;
+				return true;
+			case 'n':
+				this.underlined = true;
+				return true;
+			case 'o':
+				this.italic = true;
+				return true;
+			case 'r':
+				resetDecorations();
+				setColor(NamedTextColor.WHITE);
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		private void applyHex(String hexDigits) {
+			if (hexDigits == null || hexDigits.length() != 12) {
+				return;
+			}
+			StringBuilder hex = new StringBuilder("#");
+			for (int i = 0; i < hexDigits.length(); i += 2) {
+				hex.append(hexDigits.charAt(i + 1));
+			}
+			try {
+				TextColor textColor = TextColor.fromHexString(hex.toString());
+				if (textColor != null) {
+					setColor(textColor);
+				}
+			} catch (IllegalArgumentException exception) {
+				// Ignore invalid hex codes and continue with the previous style.
+			}
+		}
+
+		private void setColor(TextColor color) {
+			this.color = color;
+			resetDecorations();
+		}
+
+		private void resetDecorations() {
+			this.bold = false;
+			this.obfuscated = false;
+			this.italic = false;
+			this.strikethrough = false;
+			this.underlined = false;
+		}
+
+		private Style toStyle() {
+			Style style = Style.style().color(this.color).build();
+			if (this.bold) {
+				style = style.decorate(TextDecoration.BOLD);
+			}
+			if (this.obfuscated) {
+				style = style.decorate(TextDecoration.OBFUSCATED);
+			}
+			if (this.italic) {
+				style = style.decorate(TextDecoration.ITALIC);
+			}
+			if (this.strikethrough) {
+				style = style.decorate(TextDecoration.STRIKETHROUGH);
+			}
+			if (this.underlined) {
+				style = style.decorate(TextDecoration.UNDERLINED);
+			}
+			return style;
+		}
 	}
 
 	public static String getLastCode(String s) {
@@ -235,270 +366,6 @@ public class Format {
 		return ts;
 	}
 
-	/**
-     * Converts a message to JSON colors with no additional JSON extensions.
-     *
-     * @param s
-     * @return {@link String}
-     */
-	public static String convertToJsonColors(String s) {
-		return convertToJsonColors(s, "");
-	}
-
-	/**
-     * Converts a message to JSON colors with additional JSON extensions.
-     *
-     * @param s
-     * @param extensions
-     * @return {@link String}
-     */
-	private static String convertToJsonColors(String s, String extensions) {
-		String remaining = s;
-		String temp = "";
-		int indexColor = -1;
-		int indexNextColor = -1;
-		String color = "";
-		String modifier = "";
-		boolean bold = false;
-		boolean obfuscated = false;
-		boolean italic = false;
-		boolean strikethrough = false;
-		boolean underlined = false;
-		String previousColor = "";
-		int colorLength = LEGACY_COLOR_CODE_LENGTH;
-		do {
-			if (remaining.length() < LEGACY_COLOR_CODE_LENGTH) {
-				temp = "{\"text\":\"" + remaining + "\"},";
-				break;
-			}
-			modifier = "";
-			indexColor = remaining.indexOf(BUKKIT_COLOR_CODE_PREFIX);
-			previousColor = color;
-
-			color = remaining.substring(1, indexColor + LEGACY_COLOR_CODE_LENGTH);
-			if (color.equals(BUKKIT_HEX_COLOR_CODE_PREFIX)) {
-				if (remaining.length() >= HEX_COLOR_CODE_LENGTH) {
-					color = HEX_COLOR_CODE_PREFIX
-							+ remaining.substring(LEGACY_COLOR_CODE_LENGTH, indexColor + HEX_COLOR_CODE_LENGTH)
-									.replace(BUKKIT_COLOR_CODE_PREFIX, "");
-					colorLength = HEX_COLOR_CODE_LENGTH;
-					bold = false;
-					obfuscated = false;
-					italic = false;
-					strikethrough = false;
-					underlined = false;
-				}
-			} else if (!color.matches("[0123456789abcdefABCDEF]")) {
-				switch (color) {
-				case "l":
-				case "L": {
-					bold = true;
-					break;
-				}
-				case "k":
-				case "K": {
-					obfuscated = true;
-					break;
-				}
-				case "o":
-				case "O": {
-					italic = true;
-					break;
-				}
-				case "m":
-				case "M": {
-					strikethrough = true;
-					break;
-				}
-				case "n":
-				case "N": {
-					underlined = true;
-					break;
-				}
-				case "r":
-				case "R": {
-					bold = false;
-					obfuscated = false;
-					italic = false;
-					strikethrough = false;
-					underlined = false;
-					color = "f";
-					break;
-				}
-				}
-				if (!color.equals("f"))
-					color = previousColor;
-				if (color.length() == 0)
-					color = "f";
-			} else {
-				bold = false;
-				obfuscated = false;
-				italic = false;
-				strikethrough = false;
-				underlined = false;
-			}
-			if (bold)
-				if (VersionHandler.isAtLeast_1_20_4()) {
-					modifier += ",\"bold\":true";
-				} else {
-					modifier += ",\"bold\":\"true\"";
-				}
-			if (obfuscated)
-				if (VersionHandler.isAtLeast_1_20_4()) {
-					modifier += ",\"obfuscated\":true";
-				} else {
-					modifier += ",\"obfuscated\":\"true\"";
-				}
-			if (italic)
-				if (VersionHandler.isAtLeast_1_20_4()) {
-					modifier += ",\"italic\":true";
-				} else {
-					modifier += ",\"italic\":\"true\"";
-				}
-			if (underlined)
-				if (VersionHandler.isAtLeast_1_20_4()) {
-					modifier += ",\"underlined\":true";
-				} else {
-					modifier += ",\"underlined\":\"true\"";
-				}
-			if (strikethrough)
-				if (VersionHandler.isAtLeast_1_20_4()) {
-					modifier += ",\"strikethrough\":true";
-				} else {
-					modifier += ",\"strikethrough\":\"true\"";
-				}
-			remaining = remaining.substring(colorLength);
-			colorLength = LEGACY_COLOR_CODE_LENGTH;
-			indexNextColor = remaining.indexOf(BUKKIT_COLOR_CODE_PREFIX);
-			if (indexNextColor == -1) {
-				indexNextColor = remaining.length();
-			}
-			temp += "{\"text\":\"" + remaining.substring(0, indexNextColor) + "\",\"color\":\""
-					+ hexidecimalToJsonColorRGB(color) + "\"" + modifier + extensions + "},";
-			remaining = remaining.substring(indexNextColor);
-		} while (remaining.length() > 1 && indexColor != -1);
-		if (temp.length() > 1)
-			temp = temp.substring(0, temp.length() - 1);
-		return temp;
-	}
-
-	private static String hexidecimalToJsonColorRGB(String c) {
-		if (c.length() == 1) {
-			switch (c) {
-			case "0":
-				return "black";
-			case "1":
-				return "dark_blue";
-			case "2":
-				return "dark_green";
-			case "3":
-				return "dark_aqua";
-			case "4":
-				return "dark_red";
-			case "5":
-				return "dark_purple";
-			case "6":
-				return "gold";
-			case "7":
-				return "gray";
-			case "8":
-				return "dark_gray";
-			case "9":
-				return "blue";
-			case "a":
-			case "A":
-				return "green";
-			case "b":
-			case "B":
-				return "aqua";
-			case "c":
-			case "C":
-				return "red";
-			case "d":
-			case "D":
-				return "light_purple";
-			case "e":
-			case "E":
-				return "yellow";
-			case "f":
-			case "F":
-				return "white";
-			default:
-				return "white";
-			}
-		}
-		if (isValidHexColor(c)) {
-			return c;
-		}
-		return "white";
-	}
-
-	public static String convertPlainTextToJson(String s, boolean convertURL) {
-		s = escapeJsonChars(s);
-		if (convertURL) {
-			return "[" + Format.convertLinks(s) + "]";
-		} else {
-			return "[" + convertToJsonColors(DEFAULT_COLOR_CODE + s) + "]";
-		}
-	}
-	
-	private static String escapeJsonChars(String s) {
-		return s.replace("\\", "\\\\").replace("\"", "\\\"");
-	}
-
-	public static PacketContainer createPacketPlayOutChat(String json) {
-		final PacketContainer container;
-		if (VersionHandler.isAtLeast_1_20_4()) { // 1.20.4+
-			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-			container.getChatComponents().write(0, WrappedChatComponent.fromJson(json));
-			container.getBooleans().write(0, false);
-		} else if (VersionHandler.isAbove_1_19()) { // 1.19.1 -> 1.20.3
-			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-			container.getStrings().write(0, json);
-			container.getBooleans().write(0, false);
-		} else if (VersionHandler.isUnder_1_19()) { // 1.7 -> 1.19
-			WrappedChatComponent component = WrappedChatComponent.fromJson(json);
-			container = new PacketContainer(PacketType.Play.Server.CHAT);
-			container.getModifier().writeDefaults();
-			container.getChatComponents().write(0, component);
-		} else { // 1.19
-			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-			container.getStrings().write(0, json);
-			container.getIntegers().write(0, 1);
-		}
-		return container;
-	}
-
-	public static PacketContainer createPacketPlayOutChat(WrappedChatComponent component) {
-		final PacketContainer container;
-		if (VersionHandler.isAtLeast_1_20_4()) { // 1.20.4+
-			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-			container.getChatComponents().write(0, component);
-			container.getBooleans().write(0, false);
-		} else if (VersionHandler.isAbove_1_19()) { // 1.19.1 -> 1.20.3
-			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-			container.getStrings().write(0, component.getJson());
-			container.getBooleans().write(0, false);
-		} else if (VersionHandler.isUnder_1_19()) { // 1.7 -> 1.19
-			container = new PacketContainer(PacketType.Play.Server.CHAT);
-			container.getModifier().writeDefaults();
-			container.getChatComponents().write(0, component);
-		} else { // 1.19
-			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-			container.getStrings().write(0, component.getJson());
-			container.getIntegers().write(0, 1);
-		}
-		return container;
-	}
-
-	public static void sendPacketPlayOutChat(Player player, PacketContainer packet) {
-		try {
-			ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
 	@SuppressWarnings("unchecked")
 	public static String toColoredText(Object o, Class<?> c) {
 		if (VersionHandler.is1_7()) {
@@ -707,6 +574,10 @@ public class Format {
 		String allFormated = Format.FormatString(string);
 		allFormated = Format.FormatStringColor(allFormated);
 		return allFormated;
+	}
+
+	public static boolean startsWithColorCode(String text) {
+		return text != null && LEADING_COLOR_CODE_PATTERN.matcher(text).find();
 	}
 
 	public static String FilterChat(String msg) {

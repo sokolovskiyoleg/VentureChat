@@ -10,8 +10,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import com.comphenix.protocol.ProtocolLibrary;
-
 import mineverse.Aust1n46.chat.alias.Alias;
 import mineverse.Aust1n46.chat.api.MineverseChatAPI;
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
@@ -20,14 +18,12 @@ import mineverse.Aust1n46.chat.channel.ChatChannelInfo;
 import mineverse.Aust1n46.chat.command.VentureCommandExecutor;
 import mineverse.Aust1n46.chat.database.Database;
 import mineverse.Aust1n46.chat.database.PlayerData;
-import mineverse.Aust1n46.chat.json.JsonFormat;
+import mineverse.Aust1n46.chat.formatting.ChatFormat;
 import mineverse.Aust1n46.chat.listeners.ChatListener;
 import mineverse.Aust1n46.chat.listeners.CommandListener;
 import mineverse.Aust1n46.chat.listeners.LoginListener;
-import mineverse.Aust1n46.chat.listeners.PacketListenerLegacyChat;
 import mineverse.Aust1n46.chat.localization.Localization;
 import mineverse.Aust1n46.chat.utilities.Format;
-import mineverse.Aust1n46.chat.versions.VersionHandler;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 
@@ -153,9 +149,6 @@ public class MineverseChat extends JavaPlugin {
 		pluginManager.registerEvents(new ChatListener(), this);
 		pluginManager.registerEvents(new CommandListener(), this);
 		pluginManager.registerEvents(new LoginListener(), this);
-		if (VersionHandler.isUnder_1_19()) {
-			ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListenerLegacyChat());
-		}
 	}
 	
 	private boolean setupPermissions() {
@@ -181,7 +174,7 @@ public class MineverseChat extends JavaPlugin {
 	public static void initializeConfigReaders() {
 		Localization.initialize();
 		Alias.initialize();
-		JsonFormat.initialize();
+		ChatFormat.initialize();
 		ChatChannel.initialize();
 	}
 	

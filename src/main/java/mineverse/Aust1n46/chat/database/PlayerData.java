@@ -59,12 +59,12 @@ public class PlayerData {
                 UUID party = playerData.getConfigurationSection("players." + uuidString).getString("party").length() > 0 ? UUID.fromString(playerData.getConfigurationSection("players." + uuidString).getString("party")) : null;
                 boolean filter = playerData.getConfigurationSection("players." + uuidString).getBoolean("filter");
                 boolean notifications = playerData.getConfigurationSection("players." + uuidString).getBoolean("notifications");
-                String jsonFormat = "Default";
+                String chatFormat = "Default";
                 boolean spy = playerData.getConfigurationSection("players." + uuidString).getBoolean("spy", false);
                 boolean commandSpy = playerData.getConfigurationSection("players." + uuidString).getBoolean("commandspy", false);
                 boolean rangedSpy = playerData.getConfigurationSection("players." + uuidString).getBoolean("rangedspy", false);
                 boolean messageToggle = playerData.getConfigurationSection("players." + uuidString).getBoolean("messagetoggle", true);
-                MineverseChatPlayer mcp = new MineverseChatPlayer(uuid, name, ignores, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
+                MineverseChatPlayer mcp = new MineverseChatPlayer(uuid, name, ignores, host, party, filter, notifications, chatFormat, spy, commandSpy, rangedSpy, messageToggle);
                 mcp.setModified(true);
                 MineverseChatAPI.addMineverseChatPlayerToMap(mcp);
                 MineverseChatAPI.addNameToMap(mcp);
@@ -124,12 +124,12 @@ public class PlayerData {
             UUID party = playerDataFileYamlConfiguration.getString("party").length() > 0 ? UUID.fromString(playerDataFileYamlConfiguration.getString("party")) : null;
             boolean filter = playerDataFileYamlConfiguration.getBoolean("filter");
             boolean notifications = playerDataFileYamlConfiguration.getBoolean("notifications");
-            String jsonFormat = "Default";
+            String chatFormat = "Default";
             boolean spy = playerDataFileYamlConfiguration.getBoolean("spy", false);
             boolean commandSpy = playerDataFileYamlConfiguration.getBoolean("commandspy", false);
             boolean rangedSpy = playerDataFileYamlConfiguration.getBoolean("rangedspy", false);
             boolean messageToggle = playerDataFileYamlConfiguration.getBoolean("messagetoggle", true);
-            mcp = new MineverseChatPlayer(uuid, name, ignores, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
+            mcp = new MineverseChatPlayer(uuid, name, ignores, host, party, filter, notifications, chatFormat, spy, commandSpy, rangedSpy, messageToggle);
         } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - Error Loading Data File: " + playerDataFile.getName()));
             Bukkit.getConsoleSender().sendMessage(Format.FormatStringAll("&8[&eVentureChat&8]&c - File will be skipped and deleted." ));

@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import mineverse.Aust1n46.chat.ChatMessage;
 import mineverse.Aust1n46.chat.channel.ChatChannel;
-import mineverse.Aust1n46.chat.json.JsonFormat;
+import mineverse.Aust1n46.chat.formatting.ChatFormat;
 
 /**
  * Wrapper for {@link Player}
@@ -40,17 +40,17 @@ public class MineverseChatPlayer {
 	private HashMap<ChatChannel, List<Long>> spam;
 	private boolean modified;
 	private List<ChatMessage> messages;
-	private String jsonFormat;
+	private String chatFormat;
 	private boolean editing;
 	private boolean rangedSpy;
 	private boolean messageToggle;
 	
 	@Deprecated
-	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String nickname, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
-		this(uuid, name, ignores, host, party, filter, notifications, jsonFormat, spy, commandSpy, rangedSpy, messageToggle);
+	public MineverseChatPlayer(UUID uuid, String name, ChatChannel currentChannel, Set<UUID> ignores, Set<String> listening, Set<String> blockedCommands, boolean host, UUID party, boolean filter, boolean notifications, String nickname, String chatFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
+		this(uuid, name, ignores, host, party, filter, notifications, chatFormat, spy, commandSpy, rangedSpy, messageToggle);
 	}
 	
-	public MineverseChatPlayer(UUID uuid, String name, Set<UUID> ignores, boolean host, UUID party, boolean filter, boolean notifications, String jsonFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
+	public MineverseChatPlayer(UUID uuid, String name, Set<UUID> ignores, boolean host, UUID party, boolean filter, boolean notifications, String chatFormat, boolean spy, boolean commandSpy, boolean rangedSpy, boolean messageToggle) {
 		this.uuid = uuid;
 		this.name = name;
 		this.ignores = ignores;
@@ -69,7 +69,7 @@ public class MineverseChatPlayer {
 		this.partyChat = false;
 		this.modified = false;
 		this.messages = new ArrayList<ChatMessage>();
-		this.jsonFormat = jsonFormat;
+		this.chatFormat = chatFormat;
 		this.cooldowns = new HashMap<ChatChannel, Long>();
 		this.spam = new HashMap<ChatChannel, List<Long>>();
 		this.messageToggle = messageToggle;
@@ -94,7 +94,7 @@ public class MineverseChatPlayer {
 		this.partyChat = false;
 		this.modified = false;
 		this.messages = new ArrayList<ChatMessage>();
-		this.jsonFormat = "Default";
+		this.chatFormat = "Default";
 		this.cooldowns = new HashMap<ChatChannel, Long>();
 		this.spam = new HashMap<ChatChannel, List<Long>>();
 		this.messageToggle = true;
@@ -352,18 +352,15 @@ public class MineverseChatPlayer {
 		this.messages.clear();
 	}
 
-	public String getJsonFormat() {
-		return this.jsonFormat;
+	public String getChatFormat() {
+		return this.chatFormat;
 	}
-
-	public void setJsonFormat() {
-		this.jsonFormat = "Default";
-		for(JsonFormat j : JsonFormat.getJsonFormats()) {
-			if(this.getPlayer().hasPermission("venturechat.json." + j.getName())) {
-				if(JsonFormat.getJsonFormat(this.getJsonFormat()).getPriority() > j.getPriority()) {
-					this.jsonFormat = j.getName();
-				}
-			}
+	
+	public void setChatFormat() {
+		this.chatFormat = "Default";
+		ChatFormat chatFormat = ChatFormat.selectChatFormat(this.getPlayer(), ChatFormat.getChatFormats());
+		if (chatFormat != null) {
+			this.chatFormat = chatFormat.getName();
 		}
 	}
 }

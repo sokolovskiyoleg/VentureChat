@@ -292,7 +292,6 @@ public class ChatListener implements Listener {
 			}
 		}
 
-		Format.sendComponent(Bukkit.getConsoleSender(), Format.legacyToComponent(ventureChatEvent.getConsoleChat()));
 		if (essentialsDiscordHook) {
 			Bukkit.getServicesManager().load(DiscordService.class).sendChatMessage(mcp.getPlayer(), filteredChat);
 		}
